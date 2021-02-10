@@ -127,3 +127,5 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+/Tama/.vs/Tama/v16
+/.vs
