@@ -13,14 +13,16 @@ import asyncio
 import pathlib
 import os
 import importlib
+from queue import Queue
 '''
 This section is going to be importing the modules in every subdirectory of the Modules folder,
-as well as saving the names of these modules in a List in order to reference them against 
-each module's dependencies later.
+initializing the main classes they contain, and then will then run the tick() function for each
+module contained in the folder, adding each returned function from tick to the event queue for 
+future processing.
 '''
 # Get the absolute path Tama is in, and iterate over each folder in the Modules directory to get the list of module names.
 TamaPath = os.path.dirname(__file__)
-ModulesPath = TamaPath + '\\Modules'
+ModulesPath = os.path.join(TamaPath, 'Modules')
 ModulesList = []
 
 for entry in os.scandir(ModulesPath):
@@ -40,7 +42,16 @@ print('Modules Found: ')
 print(ModulesList)
 for module in ModulesList:
     try:
-        exec('mod = '+ module + '.run()')
+        #initialize each module as a class with the name stored in module
+        exec('mod = {}.{}()'.format(module, module, module))
+        vars()[module] = mod
     except Exception as e:
-            print('Module failed to run: {}'.format(e))
+            print('Module failed to initialize: {}'.format(e))
             continue
+
+for module in ModulesList:
+    try:
+        vars()[module].tick('this is a call for help')
+    except Exception as e:
+        print('Module failed to tick: {}'.format(e))
+        continue

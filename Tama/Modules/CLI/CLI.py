@@ -1,8 +1,15 @@
-def get_dependencies(self):
-    return ['']
+from datetime import datetime, timedelta
+import asyncio
 
-def setup_comms(in_port, out_port):
-    pass
+class CLI:
+    def __init__(self):
+        return
 
-def run():
-    print('Hello from CLI')
+    async def get_dependencies(self):
+        return ['']
+
+    async def setup_comms(in_port, out_port):
+        pass
+
+    def tick(self, message):
+        print('CLI Recieved A Message: ' + message)
