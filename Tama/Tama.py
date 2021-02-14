@@ -13,21 +13,35 @@ import asyncio
 import pathlib
 import os
 import importlib
+from queue import Queue
+from task import task
 '''
 This section is going to be importing the modules in every subdirectory of the Modules folder,
-as well as saving the names of these modules in a List in order to reference them against 
-each module's dependencies later.
+initializing the main classes they contain, and then will then run the tick() function for each
+module contained in the folder, adding each returned function from tick to the event queue for 
+future processing.
 '''
 # Get the absolute path Tama is in, and iterate over each folder in the Modules directory to get the list of module names.
 TamaPath = os.path.dirname(__file__)
-ModulesPath = TamaPath + '\\Modules'
+ModulesPath = os.path.join(TamaPath, 'Modules')
 ModulesList = []
+
+#searches the task pool for the first task where target_module is module, and returns the index.
+def find_task(module, task_pool):
+    for idx, task in enumerate(task_pool):
+        if str(task.get_module()) == module:
+            return idx
+    return None
 
 for entry in os.scandir(ModulesPath):
     if entry.is_dir():
         try:
+            if entry.name in ModulesList:
+                raise ImportError('Module {} has same name as another module. Module Folders must have unique names.'.format(entry.name))
             exec('from Modules.{} import {}'.format(entry.name, entry.name))
+            exec('mod = {}.{}()'.format(entry.name, entry.name, entry.name))
             ModulesList.append(entry.name)
+            vars()[entry.name] = mod
         except Exception as e:
             print('Module failed to import: {}'.format(e))
             continue
@@ -38,9 +52,22 @@ for entry in os.scandir(ModulesPath):
 # Each of these lists will be stored, and resolved later, once every available module is initialized.
 print('Modules Found: ')
 print(ModulesList)
-for module in ModulesList:
-    try:
-        exec('mod = '+ module + '.run()')
-    except Exception as e:
-            print('Module failed to run: {}'.format(e))
+
+#task_pool will be a list of tuples with three entries. (target_module (string), target_function (string), argument_list (list of strings))
+#task_pool will be updated after every module tick, if response is populated with a tupl, or 'EXIT TAMA'. Else, response will be ignored.
+task_pool = [task('CLI', 'print_welcome', [])]
+exit_condition = False
+while not exit_condition:
+    for module in ModulesList:
+        try:
+            task_idx = find_task(module, task_pool)
+            if task_idx is not None and task_idx < len(task_pool):
+                task = task_pool[task_idx]
+                response = vars()[module].tick(task)
+            if type(response) is type(task):
+                task_pool.append(response)
+            if response == 'EXIT TAMA':
+                exit_condition = True
+        except Exception as e:
+            print('Module failed to tick: {}'.format(e))
             continue
