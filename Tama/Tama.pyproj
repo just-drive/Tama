@@ -24,8 +24,14 @@
     <Compile Include="Modules\CLI\cli.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Modules\CLI\__init__.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Tama.py" />
-    <Compile Include="task.py">
+    <Compile Include="TamaClasses\task.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="TamaClasses\__init__.py">
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>
@@ -33,6 +39,7 @@
     <Folder Include="Modules\" />
     <Folder Include="Modules\BasicNeeds\" />
     <Folder Include="Modules\CLI\" />
+    <Folder Include="TamaClasses\" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
   <!-- Uncomment the CoreCompile target to enable the Build command in
