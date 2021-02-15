@@ -14,7 +14,7 @@ import pathlib
 import os
 import importlib
 from queue import Queue
-from task import task
+from TamaClasses.task import task
 '''
 This section is going to be importing the modules in every subdirectory of the Modules folder,
 initializing the main classes they contain, and then will then run the tick() function for each
