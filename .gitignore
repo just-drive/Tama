@@ -129,7 +129,9 @@ dmypy.json
 # Pyre type checker
 .pyre/
 /Tama/.vs/Tama/v16
-/.vs
 
-#MAC OS Information Files
+# MAC OS Information Files
 .DS_Store
+
+# VS Project settings
+.vs/
