@@ -1,0 +1,9 @@
+[Core]
+Name = CLI
+Module = cli
+Category = user-interface
+
+[Documentation]
+Author = Dorsey Roten
+Version = 1.0
+Description = Prints messages and will be used for basic IO commands
