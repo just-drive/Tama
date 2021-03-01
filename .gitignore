@@ -1,4 +1,5 @@
 # Byte-compiled / optimized / DLL files
+*/__pycache__/
 __pycache__/
 *.py[cod]
 *$py.class
@@ -129,3 +130,6 @@ dmypy.json
 .pyre/
 /Tama/.vs/Tama/v16
 /.vs
+
+#MAC OS Information Files
+.DS_Store

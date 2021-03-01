@@ -21,25 +21,25 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Modules\CLI\cli.py">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Modules\CLI\__init__.py">
-      <SubType>Code</SubType>
-    </Compile>
+    <Compile Include="Plugins\cli\cli.py" />
+    <Compile Include="Plugins\basic_needs\basicneeds.py" />
+    <Compile Include="Plugins\basic_needs\__init__.py" />
+    <Compile Include="Plugins\cli\__init__.py" />
     <Compile Include="Tama.py" />
-    <Compile Include="TamaClasses\task.py">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="TamaClasses\__init__.py">
-      <SubType>Code</SubType>
-    </Compile>
+    <Compile Include="task.py" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Modules\" />
-    <Folder Include="Modules\BasicNeeds\" />
-    <Folder Include="Modules\CLI\" />
-    <Folder Include="TamaClasses\" />
+    <Folder Include="Food Bowl\" />
+    <Folder Include="Plugins\" />
+    <Folder Include="assets\" />
+    <Folder Include="Plugins\basic_needs\" />
+    <Folder Include="Plugins\cli\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="assets\helloworld.html" />
+    <Content Include="Food Bowl\helloworld.html" />
+    <Content Include="Plugins\basic_needs\basicneeds.yapsy-plugin" />
+    <Content Include="Plugins\cli\cli.yapsy-plugin" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
   <!-- Uncomment the CoreCompile target to enable the Build command in
