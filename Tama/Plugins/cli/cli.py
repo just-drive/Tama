@@ -14,7 +14,7 @@ class CLI(IPlugin):
         return task
 
     def set_tama_path(self, path):
-        self.tama_path = path[0]
+        self.tama_path = path
         return 'REMOVE'
 
     def tick(self, task_pool):

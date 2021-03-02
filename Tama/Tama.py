@@ -45,7 +45,7 @@ class Tama(object):
                     False,
                     pluginInfo.name,
                     'set_tama_path',
-                    [self.TamaPath])
+                    self.TamaPath)
             )
             print("{} plugin activated.".format(pluginInfo.name))
 

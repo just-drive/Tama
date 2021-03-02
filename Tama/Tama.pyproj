@@ -30,7 +30,6 @@
     <Compile Include="task.py" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Food Bowl\" />
     <Folder Include="Plugins\" />
     <Folder Include="assets\" />
     <Folder Include="Plugins\basic_needs\" />

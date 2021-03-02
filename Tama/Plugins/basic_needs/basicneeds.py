@@ -244,7 +244,7 @@ class BasicNeeds(IPlugin):
             self.food_bowl = os.path.join(self.tama_path, "Food Bowl")
 
     def set_tama_path(self, path):
-        self.tama_path = path[0]
+        self.tama_path = path
         self.set_food_bowl(self.tama_path)
         self.eating_system = EatingSystem(self.food_bowl)
         #This task can safely be removed once it is complete
