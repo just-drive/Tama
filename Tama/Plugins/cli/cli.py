@@ -4,10 +4,18 @@ from yapsy.IPlugin import IPlugin
 class CLI(IPlugin):
     def __init__(self):
         super().__init__()
+        self.tama_path = None
         return
 
-    def work_task(self, item):
-        return getattr(self, item.get_func())(item.get_args())
+    def work_task(self, task):
+        if not task.is_done():
+            task.set_result(getattr(self, task.get_func())(task.get_args()))
+            task.set_done(True)
+        return task
+
+    def set_tama_path(self, path):
+        self.tama_path = path[0]
+        return 'REMOVE'
 
     def tick(self, task_pool):
         idxlist = task.find_tasks('CLI', task_pool)
