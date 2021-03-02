@@ -9,7 +9,8 @@ class EatingSystem(object):
         self.food_bowl = food_bowl
         #waste size is the configurable number used to know when a stomach is full enough
         #to create slime waste (it is in kB)
-        self.waste_size = 1024
+        #default waste_size is 100 mb of data. 1kB * 1024 * 100 = 100 mb
+        self.waste_size = 1024 * 100
         #Number of kBs required to raise Tama's hunger by 1 point
         self.kb_per_hunger_pt = 1
         #stomach will contain files that are currently being "eaten", as well as their current size
@@ -21,6 +22,11 @@ class EatingSystem(object):
         self.regained_hunger = 0
 
     def add_food(self, file):
+        """
+        Checks both the stomach and the waste lists against an incoming file.
+        If the file is in either of these lists, do nothing,
+        else add the file to the stomach so it can be eaten.
+        """
         new_food_flag = True
         for food in self.stomach:
             if food[0] == file:
@@ -33,24 +39,37 @@ class EatingSystem(object):
         return
     
     def check_food_bowl(self):
+        """
+        This method gathers a list of all files currently in the Food Bowl
+        Begin by detecting if any files have been removed, so they can be
+        removed from the stomach and waste lists.
+        """
         files = []
+        has_food = False
         for (dirpath, dirnames, filenames) in os.walk(self.food_bowl):
             check_files = [os.path.join(dirpath, file) for file in filenames]
+            files.append(check_files)
             if len(check_files) > 0:
                 for file in check_files:
                     self.add_food(file)
                 if len(self.stomach) > 0:
-                    return True
-                else:
-                    return False
+                    has_food = True
+        return has_food
 
     def nibble(self, food):
+        """
+        Consumes a small amount of food per eat() call in order to prevent this functionality from blocking work elsewhere.
+        """
         food = (food[0], food[1] - self.kb_per_hunger_pt)
         kb_consumed = self.kb_per_hunger_pt + (food[1] if food[1] < 0 else 0)
         self.regained_hunger += kb_consumed / self.kb_per_hunger_pt
         return food
 
     def deal_with_waste(self):
+        """
+        This method allows waste to exist until enough data is added to create a slime waste zip file.
+        Once there is enough waste, this method moves the waste to the recycling bin.
+        """
         waste_size = 0
         for waste_item in self.waste:
             waste_size += os.path.getsize(waste_item[0]) / 1024
@@ -61,8 +80,12 @@ class EatingSystem(object):
     def eat(self):
         """
         This function will be treated like a tick function, as it is called in the basic needs tick function
+        Regained hunger is added to in small increments by the nibble function, and then returned after a
+        nibble completes.
+
+        If the previous nibble removed the last bit of data from the food, then move the food into the waste
+        and deal with that waste if you need to.
         """
-        #regained hunger will be returned to basic needs to add to Tama's hunger level
         self.regained_hunger = 0
         if self.check_food_bowl():
             food = self.stomach[0]
@@ -71,10 +94,22 @@ class EatingSystem(object):
                 self.stomach[0] = food
             elif food[1] <= 0:
                 self.waste.append(self.stomach.pop(0))
-        self.deal_with_waste()
-        return self.regained_hunger
+
+        #this try except block catches errors thrown when the user removes files from the food folder manually.
+        #If an error is thrown, clear the stomach and waste lists, they will be rebuilt automatically.
+        try:
+            self.deal_with_waste()
+        except Exception as e:
+            self.stomach.clear()
+            self.waste.clear()
+            pass
+        finally:
+            return self.regained_hunger
 
     def zip_eaten_food(self):
+        """
+        This function does the ugly os.remove() deletion, but makes sure the waste item is zipped first.
+        """
         waste = ZipFile('Slime Waste.zip', 'w')
         for waste_item in self.waste:
             waste.write(waste_item[0])
@@ -84,5 +119,8 @@ class EatingSystem(object):
         return
     
     def recycle_waste(self, file):
+        """
+        Convenience method calls send2trash with a given path
+        """
         send2trash(file)
         pass

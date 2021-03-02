@@ -11,6 +11,10 @@
     <OutputPath>.</OutputPath>
     <Name>Tama</Name>
     <RootNamespace>Tama</RootNamespace>
+    <IsWindowsApplication>True</IsWindowsApplication>
+    <TestFramework>unittest</TestFramework>
+    <UnitTestPattern>test*.py</UnitTestPattern>
+    <UnitTestRootDirectory>.Tests</UnitTestRootDirectory>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>

@@ -1,4 +1,26 @@
 class task:
+    """
+    task objects require: 
+    - sender (pluginInfo.Name or 'str') - who sent this task?
+    - requires_feedback (bool) - Should this task be sent back when I'm done?
+    - target_plugin (pluginInfo.Name or 'str') - who needs to work on this task?
+    - func (string name of target function) - this will be invoked as a function name
+    - args (List of things) - can be anything, as long as it's wrapped in a list.
+
+    Implemented plugins should contain some variation of this method. Call it to execute
+    a task, and your implementation might decide to modify the task further before 
+    returning it.
+
+    **TODO: Create asynchronous task working handler function that can be called to return
+    an awaitable task object when a task is initialized.**
+
+    def work_task(self, task):
+        if not task.is_done():
+            task.set_result(getattr(self, task.get_func())(task.get_args()))
+            task.set_done(True)
+        return task
+
+    """
     def __init__(self, sender, requires_feedback, target_plugin, func, args):
         self.sender = sender
         self.requires_feedback = requires_feedback
@@ -9,6 +31,9 @@ class task:
         self.done = False
         self.result = None
     
+    """
+    Getters and setters for every task attribute allow for tasks to be modified by plugins dynamically.
+    """
     def get_sender(self):
         return self.sender
 
@@ -65,9 +90,11 @@ class task:
         self.done = boolval
         return self
 
-    #searches the task pool for the first task where target_plugin is plugin, and returns the index.
     @staticmethod
     def find_tasks(plugin, task_pool):
+        """
+        Searches the task pool for the first task where target_plugin is plugin, and returns the index.
+        """
         idxlist = []
         for idx, item in enumerate(task_pool):
             if str(item.get_plugin()) == plugin:

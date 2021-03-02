@@ -6,14 +6,35 @@ import os
 from Plugins.basic_needs.eatingsystem import EatingSystem
 
 class BasicNeeds(IPlugin):
-
+    """
+    The BasicNeeds object doesn't require anything to start, except for a path to Tama, or the root folder Tama is located in.
+    Right now this is done by passing the information to the module with a task object generated in the __init__ of Tama, but
+    in the future I would like to see plugins ask for information through tasks instead.
+    """
     def __init__(self):
+        """
+        super().__init__() must be called by a plugin class's own __init__ or the load might not work properly.
+
+        Tama's stats begin at maximum when Tama is initialized, and will change according to a time delta each time the 
+        tick() function is run.
+
+        There are four main stats carried by BasicNeeds currently.
+        -Happiness
+        -Satiation (The opposite of hunger)
+        -Energy
+        -Health
+
+        These stats use 'reverse threshold dictionaries' which map certain value of Tama's core stats to certain rate variability.
+
+        Adding more stats is possible, so if you feel inclined to modify the source, follow the four that already exist.
+        """
         super().__init__()
         #Tama's stats begin at maximum when Tama is initialized, and will change each time the tick() function is run.
         self.happiness_max = self.happiness = 10
         self.satiation_max = self.satiation = 10
         self.energy_max = self.energy = 10
-        self.health_max = self.health = 200
+        self.health_max = self.health = 5
+        #Tama path will be read later, as it requires info from Tama to become useful.
         self.tama_path = None
 
         #The thresholds for each of Tama's stats represent the lowest each stat can be before changing to the next level down.
@@ -97,6 +118,12 @@ class BasicNeeds(IPlugin):
         return self.check_if_alive()
 
     def calc_stats(self):
+        """
+        This function simply multiplies the rate by time to get a solid stat value according to how long Tama has been ran.
+        It also sets tolerances for the values as soon as they have been changed.
+
+        Todo: add levels to each, if gamifying is an option, or create a leveling module that can track Tama's xp over many runs.
+        """
         self.happiness += (self.time_delta * self.happiness_rate)
         if self.happiness > self.happiness_max:
             self.happiness = self.happiness_max
@@ -183,6 +210,8 @@ class BasicNeeds(IPlugin):
             happiness_rate += -.5
 
         #now that all the rates have been calculated, set class variables
+        #this method needs to be called in a conistent matter, as it is where
+        #rates are overwritten.
         self.happiness_rate = happiness_rate
         self.satiation_rate = satiation_rate
         self.energy_rate = energy_rate
@@ -220,6 +249,15 @@ class BasicNeeds(IPlugin):
         }
 
     def add_stat_after_seconds(self, args):
+        """
+        This is a task method.
+
+        This method sits in the task pool for a certain number of seconds. Args is a list that looks like:
+        args[0] = Stat you wish to modify (Either "Happiness", "Satiations", "Energy", "Health")
+        args[1] = Amount you wish to modify the stat by (can be negative and/or float value)
+        args[2] = The amount of time until this task takes effect, in seconds.
+        args[3] = a datetime.today() call, which must be used when the task is created.
+        """
         time_delta = datetime.today() - args[3]
         if time_delta >= timedelta(seconds = args[2]):
             if args[0] == "Happiness":
@@ -230,6 +268,8 @@ class BasicNeeds(IPlugin):
                 self.energy += args[1]
             elif args[0] == "Satiation":
                 self.health += args[1]
+            #This line is needed, or this method will be called repeatedly
+            #due to its position in the task handling section.
             self.calculate_needs()
             return 'REMOVE'
         return
@@ -244,6 +284,14 @@ class BasicNeeds(IPlugin):
             self.food_bowl = os.path.join(self.tama_path, "Food Bowl")
 
     def set_tama_path(self, path):
+        """
+        This is a task method.
+
+        It recieves the path to the directory where Tama.py resides, and then:
+        - Sets the path in BasicNeeds
+        - Either finds or creates the food bowl
+        - Instanciates the eating system
+        """
         self.tama_path = path
         self.set_food_bowl(self.tama_path)
         self.eating_system = EatingSystem(self.food_bowl)
@@ -262,25 +310,29 @@ class BasicNeeds(IPlugin):
         This method is run every time this plugin is activated, and should be treated as an entry point to the module.
         You've received a task pool called task_pool. Look through the task pool for stuff you can do. schedule tasks for them, or otherwise process them,
         and put any number of new tasks in the task_pool if you need something else done.
-        """ 
-        #This should only run once, to handle setting up the food bowl and eating system.
+
+
+        """
+        
+        #This bit is called first and until self.tama_path exists,
+        #Some form of this statement can be used to get startup values
+        #That couldn't have been included in the __init__ call.
         if self.tama_path is None:
             idxlist = task.find_tasks('Basic Needs', task_pool)
             for idx in idxlist:
                 item = task_pool.pop(idx)
                 task_pool.append(self.work_task(item))
             return task_pool
-        """
-        Take care of the eating process,
-        Tama will not eat while sleeping.
-        """
+
+        #Now take care of eating, Tama cannot eat while sleeping.
         if self.current_mood is not None:
-            if self.current_mood["Energy"] != "Sleeping":
+            if self.current_mood['Energy'] != 'Sleeping':
                 if self.satiation < self.satiation_max: 
                     self.satiation += self.eating_system.eat()
                     if self.satiation > self.satiation_max:
                         self.satiation = self.satiation_max
             else:
+                #This means Tama is sleeping, if this is the first tick he started sleeping, create a task to wake him up later
                 sleeping_benefit = task('Basic Needs', False, 'Basic Needs', 'add_stat_after_seconds', ['Energy', self.energy_max*.9, 5, datetime.today()])
                 #add the sleeping benefit once if Tama falls asleep, it will take effect after a certain number of seconds
                 sleep_flag = True
@@ -290,6 +342,7 @@ class BasicNeeds(IPlugin):
                     if item.get_func() == 'add_stat_after_seconds':
                         sleep_flag = False
                 if sleep_flag:
+                    #Only append this task if it's not already in the task pool
                     task_pool.append(sleeping_benefit)
                 
             
@@ -313,6 +366,7 @@ class BasicNeeds(IPlugin):
                     round(self.health))
             print(print_str)
             return task_pool
+        #If self.calculate_needs() returns false, then tama dies, and this is all that can be run.
         else:
             idxlist = task.find_tasks('Basic Needs', task_pool)
             for idx in idxlist:
