@@ -40,7 +40,23 @@ class Tama(object):
         located_plugins = self.plugin_manager.getAllPlugins()
         for pluginInfo in located_plugins:
             self.plugin_manager.activatePluginByName(pluginInfo.name)
+            self.task_pool.append(
+                task('Tama',
+                    False,
+                    pluginInfo.name,
+                    'set_tama_path',
+                    [self.TamaPath])
+            )
             print("{} plugin activated.".format(pluginInfo.name))
+
+    def get_tama_path(self, args):
+        return self.TamaPath
+
+    def work_task(self, task):
+        if not task.is_done():
+            task.set_result(getattr(self, task.get_func())(task.get_args()))
+            task.set_done(True)
+        return task
 
     def run(self):
         start_time = datetime.now()
@@ -48,16 +64,23 @@ class Tama(object):
             for plugin in self.plugin_manager.getAllPlugins():
                 #every plugin's tick method must return the task pool, modified or not.
                 self.task_pool = plugin.plugin_object.tick(self.task_pool)
+                
+                #take care of Tama-addressed tasks
+                for idx in task.find_tasks('Tama', self.task_pool):
+                    item = task_pool.pop(idx)
+                    self.task_pool.append(self.work_task(item))
 
                 #look for the EXIT TAMA escape message, if not found, purge the task_pool and continue.
                 if 'EXIT TAMA' in self.task_pool:
                     self.alive = False
                     self.task_pool.remove('EXIT TAMA')
                 else:
-                    #purge the task pool of non-tasks, to prevent accidental appends from
+                    #purge the task pool of non-tasks and tasks labeled 'REMOVE', to prevent accidental appends from
                     #causing task pool to grow too big with useless data.
                     for item in self.task_pool:
                         if not task.is_valid_task(item):
+                            self.task_pool.remove(item)
+                        elif item.get_result() == 'REMOVE':
                             self.task_pool.remove(item)
         end_time = datetime.now()
         print("Tama lived for {} seconds".format((end_time - start_time).total_seconds()))
