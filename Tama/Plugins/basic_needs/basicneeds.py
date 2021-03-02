@@ -30,10 +30,10 @@ class BasicNeeds(IPlugin):
         """
         super().__init__()
         #Tama's stats begin at maximum when Tama is initialized, and will change each time the tick() function is run.
-        self.happiness_max = self.happiness = 10
-        self.satiation_max = self.satiation = 10
-        self.energy_max = self.energy = 10
-        self.health_max = self.health = 5
+        self.happiness_max = self.happiness = 100
+        self.satiation_max = self.satiation = 100
+        self.energy_max = self.energy = 100
+        self.health_max = self.health = 100
         #Tama path will be read later, as it requires info from Tama to become useful.
         self.tama_path = None
 
