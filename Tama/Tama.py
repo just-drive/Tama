@@ -23,7 +23,7 @@ from yapsy.PluginInfo import PluginInfo
 class Tama(object):
     
     def __init__(self):
-        self.TamaPath = os.path.dirname(__file__)
+        self.TamaPath = os.path.dirname(os.path.abspath(__file__))
         self.plugin_manager = PluginManager()
         self.task_pool = []
         self.alive = True
