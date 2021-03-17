@@ -9,6 +9,7 @@ The Tama Main module is designed to:
 - Expose a way to safely terminate the program from any plugin
 '''
 
+import wx
 import asyncio
 import pathlib
 import os
@@ -27,7 +28,7 @@ class Tama(object):
         self.plugin_manager = PluginManager()
         self.task_pool = []
         self.alive = True
-        self.loop = asyncio.get_event_loop()
+        self.app = wx.App()
         self.time_delta = timedelta()
 
         plugin_folders = []
@@ -114,8 +115,23 @@ class Tama(object):
             pass
 
     def work_task(self, task):
-        if not task.is_done():
+        if task.is_done():
+            #This bit means a task that is done has been received.
+            #So call the function in the task with the result to work with it.
+            #Then set the task for removal
+            getattr(self, task.get_func())(task.get_result())
+            task.set_result('REMOVE')
+        else:
+            #This bit means a task needs to be done, and this method
+            #might need to repackage the task so it gets returned.
             task.set_result(getattr(self, task.get_func())(task.get_args()))
+            task.set_done(True)
+            if task.get_requires_feedback():
+                sender = task.get_sender()
+                task.set_sender(task.get_plugin())
+                task.set_plugin(sender)
+            else:
+                task.set_result('REMOVE')
         return task
 
     def run(self):
@@ -136,8 +152,8 @@ class Tama(object):
                 #take care of Tama-addressed tasks
                 #These can be used in the future as a pipeline for getting info from elsewhere
                 for idx in task.find_tasks('Tama', self.task_pool):
-                    item = task_pool.pop(idx)
-                    self.task_pool.append(self.work_task(item))
+                    item = self.task_pool.pop(idx)
+                    self.task_pool.insert(idx, self.work_task(item))
 
                 else:
                     #purge the task pool of 
@@ -163,4 +179,4 @@ class Tama(object):
 
 if __name__ == "__main__":
     tama = Tama()
-    tama.run()
+    tama.app.MainLoop()

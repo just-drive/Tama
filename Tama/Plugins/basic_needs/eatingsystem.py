@@ -11,8 +11,9 @@ class EatingSystem(object):
         #to create slime waste (it is in kB)
         #default waste_size is 100 mb of data. 1kB * 1024 * 100 = 100 mb
         self.waste_size = 1024 * 100
-        #Number of kBs required to raise Tama's hunger by 1 point
-        self.kb_per_hunger_pt = 1
+        #Number of kBs required to raise Tama's hunger by self.points_per_hunger point(s)
+        self.kb_per_hunger = 100
+        self.points_per_hunger = 10
         #stomach will contain files that are currently being "eaten", as well as their current size
         #tuple(file path, uneaten file size)
         self.stomach = []
@@ -60,9 +61,9 @@ class EatingSystem(object):
         """
         Consumes a small amount of food per eat() call in order to prevent this functionality from blocking work elsewhere.
         """
-        food = (food[0], food[1] - self.kb_per_hunger_pt)
-        kb_consumed = self.kb_per_hunger_pt + (food[1] if food[1] < 0 else 0)
-        self.regained_hunger += kb_consumed / self.kb_per_hunger_pt
+        food = (food[0], food[1] - self.kb_per_hunger)
+        kb_consumed = self.kb_per_hunger + (food[1] if food[1] < 0 else 0)
+        self.regained_hunger += kb_consumed / self.kb_per_hunger * self.points_per_hunger
         return food
 
     def deal_with_waste(self):
