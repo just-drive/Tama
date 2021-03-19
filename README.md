@@ -1,50 +1,3 @@
-﻿# Tama - A Desktop Friend
-A modular desktop productivity service with flair.
-
-### University of Texas at Arlington
-
-### College of Engineering
-
-### Computer Science and Engineering Department
-
-### Iteration 1
-
-### CSE3311- Object-Oriented Software Engineering
-
-### Dr. Christoph Csallner
-
-### Team 4 Members:
-
-### William Anderson
-
-### Dorsey Roten
-
-### Meron Solomon
-
-### Revision Date: 03/01/2021
-
-
-## Table of Contents
-
-- Tama - The Friend in Your PC
-   - General Idea:
-   - Installation (Alpha):
-   - Features/Basic Requirements User Story:
-      - Milestone 1 Features – Basic Needs and CLI - Due By: March 1st, 2021 (Sprint 1)
-      - Milestone 2 Features – Productivity Tools - Due By: March 22nd, 2021 (Sprint 2)
-      - Milestone 3 Features – Animation and GUI Polishing - Due By: April 5th (Sprint 3)
-      - Milestone 4 Features – Final Release - Due By: April 26th (Sprint 4)
-- Tama Competitors
-   - Tama Competition - What We Do
-   - Tama Users and Customers
-- Tama Risks
-- Use Cases for Tama
-   - Milestone
-   - Milestone
-- Appendix
-   - Appendix A: Competitor Links
-   - Appendix B: Frequently Asked Questions (FAQ)
-   - Appendix C: Test Cases
 
 
 ## Tama - The Friend in Your PC
@@ -57,33 +10,6 @@ can become your own personal assistant, and might just make things
 easier in your life on your computer. It’s a Tamagotchi with benefits.
 An extensible productivity tool.
 Find Tama here:​ ​https://github.com/just-drive/Tama
-
-### Installation (Alpha):
-
-Pre-requirements:
-● Windows 10 64-bit. (Linux will be in a future release.)
-● Python 3.9​ (Or within 3.9.x)
-● Main branch of Tama’s source code
-● Git must be installed
-To download the source code for Tama, Git must be installed.
-
-1. Open a command prompt window
-2. Type (or paste) the following command into the command prompt
-    **git clone https://github.com/just-drive/tama.git**
-
-
-Tama currently uses two libraries that do not come inherent to Python, to install these:
-
-1. Open a command prompt window
-2. Navigate to the folder you downloaded the Github Repository to using cd
-   .
-3. Type: “pip install yapsy” Link:(​https://pypi.org/project/Yapsy/​)
-4. Type: “pip install send2trash” Link:(​https://pypi.org/project/Send2Trash/​)
-Once you do this, you should be able to run Tama by typing “python Tama.py”
-If you do not already have a “Food Bowl” folder, Tama will make one in the Github Repository Directory
-for you. Put files in the Food Bowl folder to keep Tama alive!
-Files that are placed in the Food Bowl will be eaten over time. If a file goes missing, check your OS
-Recycling Bin or Trash folder.
 
 
 Tama will run until the health meter reaches 0. Feed files to Tama in order to keep him alive.
