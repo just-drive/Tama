@@ -33,14 +33,7 @@ desktop friend/pet and will be a part of the basic Tama system (in the main modu
           Tama’s hunger levels proportionally to the size of the file deleted.
     b. Tama gets sleepy when you ask it to do things for long periods of time, or when it gets
        bored.
-
-
-```
-i. Click on Tama to wake it from its slumber. Tama will react by waking up if it has
-restored enough energy to do so.
-c. Tama gets happy when you interact with it.
-d. Tama gets sad when it “feels neglected.” Interact with Tama to raise happiness.
-```
+       
 2. Extensibility, or how moddable Tama is, is a core feature that is desired in Tama’s system. Our
     wish for Tama is to allow knowledgeable users to modify, create, add, and remove features to fit
     their own preferences. Thus, we need to provide a system that accepts “modules” that serve as
