@@ -1,6 +1,6 @@
 
 
-## Tama - The Friend in Your PC
+## Tama - The Friend in Your PC (DEVELOPMENT IN PROGRESS)
 
 ### General Idea:
 
