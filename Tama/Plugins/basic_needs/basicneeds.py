@@ -300,7 +300,7 @@ class BasicNeeds(IPlugin):
             os.mkdir(os.path.join(self.tama_path, "Food Bowl"))
             self.food_bowl = os.path.join(self.tama_path, "Food Bowl")
 
-    def set_tama_path(self, path):
+    def get_tama_path(self, path):
         """
         This is a task method.
 
@@ -348,10 +348,11 @@ class BasicNeeds(IPlugin):
         #Some form of this statement can be used to get startup values
         #That couldn't have been included in the __init__ call.
         if self.tama_path is None:
-            idxlist = task.find_tasks('Basic Needs', task_pool)
-            for idx in idxlist:
+            for idx in task.find_tasks('Basic Needs', task_pool):
                 item = task_pool.pop(idx)
                 task_pool.insert(idx, self.work_task(item))
+            if self.tama_path is None:
+                task_pool.insert(0, task('Basic Needs', True, 'Tama', 'get_tama_path', []))
             return task_pool
 
         #Now take care of eating, Tama cannot eat while sleeping.
@@ -369,12 +370,13 @@ class BasicNeeds(IPlugin):
                         if 'Eating' in self.current_mood["Modifiers"]:
                             self.current_mood["Modifiers"].remove('Eating')
                         #Tama will only think of food when hungry or starving.
-                        if 'Hungry' or 'Starving' in str(self.current_mood["Satiation"]):
+                        if ('Hungry' or 'Starving' in str(self.current_mood["Satiation"])) \
+                            and ('Thinking_of_Food' not in self.current_mood['Modifiers']):
                             self.current_mood['Modifiers'].append('Thinking_of_Food')
                     else:
                         if 'Thinking_of_Food' in self.current_mood["Modifiers"]:
                             self.current_mood["Modifiers"].remove('Thinking_of_Food')
-                        self.current_mood['Modifiers'].append('Eating')
+                            self.current_mood['Modifiers'].append('Eating')
 
                     #finally make sure satiation completes within bounds
                     if self.satiation > self.satiation_max:
