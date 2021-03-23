@@ -30,6 +30,8 @@
     <Compile Include="Plugins\basic_needs\basicneeds.py" />
     <Compile Include="Plugins\basic_needs\__init__.py" />
     <Compile Include="Plugins\cli\__init__.py" />
+    <Compile Include="Plugins\tama_drawer\tamadrawer.py" />
+    <Compile Include="Plugins\tama_drawer\tamaframe.py" />
     <Compile Include="Tama.py" />
     <Compile Include="task.py" />
   </ItemGroup>
@@ -38,9 +40,18 @@
     <Folder Include="assets\" />
     <Folder Include="Plugins\basic_needs\" />
     <Folder Include="Plugins\cli\" />
+    <Folder Include="Plugins\tama_drawer\" />
+    <Folder Include="Plugins\tama_drawer\Assets\" />
+    <Folder Include="Plugins\tama_drawer\Assets\Eating\" />
+    <Folder Include="Plugins\tama_drawer\Assets\Idle\" />
+    <Folder Include="Plugins\tama_drawer\Assets\Sleeping\" />
+    <Folder Include="Plugins\tama_drawer\Assets\Startup\" />
+    <Folder Include="Plugins\tama_drawer\Assets\Thinking_of_Food\" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Assets\booger_boy_2.png" />
+    <Content Include="assets\booger_boy_2.png" />
+    <Content Include="Plugins\tama_drawer\Assets\Eating\booger_boy_slobber.png" />
+    <Content Include="Plugins\tama_drawer\Assets\Idle\booger_boy_2.png" />
     <Content Include="Assets\booger_boy_2_wall_smoosh_right.png" />
     <Content Include="Assets\booger_boy_hungry_tans_code.png" />
     <Content Include="Assets\booger_boy_sad.png" />
@@ -51,6 +62,8 @@
     <Content Include="assets\helloworld.html" />
     <Content Include="Plugins\basic_needs\basicneeds.yapsy-plugin" />
     <Content Include="Plugins\cli\cli.yapsy-plugin" />
+    <Content Include="Plugins\tama_drawer\Assets\Thinking_of_Food\booger_boy_hungry_tans_code.png" />
+    <Content Include="Plugins\tama_drawer\tamadrawer.yapsy-plugin" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
   <!-- Uncomment the CoreCompile target to enable the Build command in

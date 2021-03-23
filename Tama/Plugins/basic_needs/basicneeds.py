@@ -172,13 +172,12 @@ class BasicNeeds(IPlugin):
             energy_rate += -0.8
             health_rate += -0.5
 
-        #Satiation directly affects happiness and health
+        #Satiation directly affects happiness,
+        #Eating restores satiation and health
         if mood["Satiation"] == "Full":
             happiness_rate += .5
-            health_rate += 1
         elif mood["Satiation"] == "Sated":
             happiness_rate += .3
-            health_rate += .3
         elif mood["Satiation"] == "Hungry":
             happiness_rate += -.1
             health_rate += -.1
@@ -209,6 +208,15 @@ class BasicNeeds(IPlugin):
             energy_rate += -.8
             happiness_rate += -.5
 
+        #modifiers change how rates work
+        if "Eating" in mood["Modifiers"]:
+            health_rate += 1
+        if "Sleeping" in mood["Modifiers"]:
+            energy_rate = 0
+            happiness_rate = 0
+            health_rate += 1
+            satiation_rate += .1
+
         #now that all the rates have been calculated, set class variables
         #this method needs to be called in a conistent matter, as it is where
         #rates are overwritten.
@@ -217,7 +225,10 @@ class BasicNeeds(IPlugin):
         self.energy_rate = energy_rate
         self.health_rate = health_rate
         
-    def calc_mood(self):
+    def get_current_mood(self, args):
+        return self.current_mood
+
+    def calc_mood(self, args = None):
         happiness_mood = None
         satiation_mood = None
         energy_mood = None
@@ -240,13 +251,20 @@ class BasicNeeds(IPlugin):
             if value[0] >= self.health > value[1]:
                 health_mood = key
 
+        if self.current_mood is not None:
+            if self.current_mood["Modifiers"] is not None:
+                modifiers = self.current_mood["Modifiers"]
+        else:
+            modifiers = []
         #Zeroes cause the above for loops to not assign a key to a mood, if so, default to lowest mood
         self.current_mood = {
             "Happiness": happiness_mood if happiness_mood is not None else 'Depressed', 
             "Satiation": satiation_mood if satiation_mood is not None else 'Starving', 
             "Energy": energy_mood if energy_mood is not None else 'Sleeping', 
-            "Health": health_mood if health_mood is not None else 'Sick'
+            "Health": health_mood if health_mood is not None else 'Sick',
+            "Modifiers": modifiers
         }
+        return self.current_mood
 
     def add_stat_after_seconds(self, args):
         """
@@ -271,7 +289,6 @@ class BasicNeeds(IPlugin):
             #This line is needed, or this method will be called repeatedly
             #due to its position in the task handling section.
             self.calculate_needs()
-            return 'REMOVE'
         return
 
     def set_food_bowl(self, path):
@@ -283,7 +300,7 @@ class BasicNeeds(IPlugin):
             os.mkdir(os.path.join(self.tama_path, "Food Bowl"))
             self.food_bowl = os.path.join(self.tama_path, "Food Bowl")
 
-    def set_tama_path(self, path):
+    def get_tama_path(self, path):
         """
         This is a task method.
 
@@ -296,13 +313,26 @@ class BasicNeeds(IPlugin):
         self.set_food_bowl(self.tama_path)
         self.eating_system = EatingSystem(self.food_bowl)
         #This task can safely be removed once it is complete
-        return 'REMOVE'
+        return
 
     def work_task(self, task):
-        if not task.is_done():
+        if task.is_done():
+            #This bit means a task that is done has been received.
+            #So call the function in the task with the result to work with it.
+            #Then set the task for removal
+            getattr(self, task.get_func())(task.get_result())
+            task.set_result('REMOVE')
+        else:
+            #This bit means a task needs to be done, and this method
+            #might need to repackage the task so it gets returned.
             task.set_result(getattr(self, task.get_func())(task.get_args()))
-            if task.get_result() == 'REMOVE':
-                task.set_done(True)
+            task.set_done(True)
+            if task.get_requires_feedback():
+                sender = task.get_sender()
+                task.set_sender(task.get_plugin())
+                task.set_plugin(sender)
+            else:
+                task.set_result('REMOVE')
         return task
 
     def tick(self, task_pool):
@@ -318,17 +348,37 @@ class BasicNeeds(IPlugin):
         #Some form of this statement can be used to get startup values
         #That couldn't have been included in the __init__ call.
         if self.tama_path is None:
-            idxlist = task.find_tasks('Basic Needs', task_pool)
-            for idx in idxlist:
+            for idx in task.find_tasks('Basic Needs', task_pool):
                 item = task_pool.pop(idx)
-                task_pool.append(self.work_task(item))
+                task_pool.insert(idx, self.work_task(item))
+            if self.tama_path is None:
+                task_pool.insert(0, task('Basic Needs', True, 'Tama', 'get_tama_path', []))
             return task_pool
 
         #Now take care of eating, Tama cannot eat while sleeping.
         if self.current_mood is not None:
             if self.current_mood['Energy'] != 'Sleeping':
-                if self.satiation < self.satiation_max: 
+                if self.current_mood['Satiation'] == 'Sated' \
+                or self.current_mood['Satiation'] == 'Hungry' \
+                or self.current_mood['Satiation'] == 'Starving' :
+                    prev_hunger = self.satiation
                     self.satiation += self.eating_system.eat()
+
+                    #if satiation didn't go up after the eat call, Tama is not eating,
+                    #and if it did, tama is eating.
+                    if self.satiation <= prev_hunger:
+                        if 'Eating' in self.current_mood["Modifiers"]:
+                            self.current_mood["Modifiers"].remove('Eating')
+                        #Tama will only think of food when hungry or starving.
+                        if ('Hungry' or 'Starving' in str(self.current_mood["Satiation"])) \
+                            and ('Thinking_of_Food' not in self.current_mood['Modifiers']):
+                            self.current_mood['Modifiers'].append('Thinking_of_Food')
+                    else:
+                        if 'Thinking_of_Food' in self.current_mood["Modifiers"]:
+                            self.current_mood["Modifiers"].remove('Thinking_of_Food')
+                            self.current_mood['Modifiers'].append('Eating')
+
+                    #finally make sure satiation completes within bounds
                     if self.satiation > self.satiation_max:
                         self.satiation = self.satiation_max
             else:
@@ -353,7 +403,7 @@ class BasicNeeds(IPlugin):
             idxlist = task.find_tasks('Basic Needs', task_pool)
             for idx in idxlist:
                 item = task_pool.pop(idx)
-                task_pool.append(self.work_task(item))
+                task_pool.insert(idx, self.work_task(item))
             #this print statement is for debugging purposes only
             print_str = 'Happiness: {} - {}, Satiation: {} - {}, Energy: {} - {}, Health: {} - {}               '.format(
                     self.current_mood["Happiness"],
