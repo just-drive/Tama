@@ -12,6 +12,11 @@ import win32.win32gui as win32gui
 from yapsy.IPlugin import IPlugin
 from datetime import timedelta
 from task import task
+import Plugins.tama_drawer as Drawer
+from Plugins.tama_drawer.window_pinning import WindowPinning
+from Plugins.tama_drawer.copy_x import CopyX
+from Plugins.tama_drawer.macro_recorder import MacroRecorder
+from Plugins.tama_drawer.window_pinning import WindowPinning
 from Plugins.tama_drawer.tamaframe import TamaFrame
 from Plugins.tama_drawer.tamastatsframe import TamaStatsFrame
 from Plugins.tama_drawer.tama_drawer_events import TamaMoodEvent
@@ -88,7 +93,17 @@ class TamaDrawer(IPlugin, wx.Frame):
         self.SetSize(self.bounding_boxes[0])
 
         #For now, we will act within a main Frame that contains Tama at all times.
-        self.frames = [TamaFrame(self), TamaStatsFrame(self)]
+        self.frames = [
+                TamaFrame(self), 
+                TamaStatsFrame(self), 
+                WindowPinning(self),
+                CopyX(),
+                MacroRecorder()
+                #HotkeyChaining()
+            ]
+        for frame in self.frames:
+            frame.Hide()
+
         self.current_display = wx.Display().GetFromPoint(self.GetPosition())
         self.Bind(EVT_TAMA_IDLE, self.on_tama_mood)
 
@@ -126,10 +141,11 @@ class TamaDrawer(IPlugin, wx.Frame):
     def on_tama_mood(self, event):
         this_event_mood = event.get_current_mood()
         for frame in self.frames:
-            if frame.needs_mood():
+            if callable(frame.needs_mood) and frame.needs_mood():
                 frame.set_current_mood(this_event_mood)
-            if frame.needs_update():
+            if callable(frame.needs_update) and frame.needs_update():
                 frame.generate(event)
+            #This could cause problems if a lot of graphical processing goes on in more than a couple of frames on Update.
             frame.Update()
 
     def work_task(self, task):

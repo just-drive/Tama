@@ -71,7 +71,10 @@ class Tama(wx.App):
                 
                 # calls the current plugin's tick() and passes it the task_pool, 
                 # then puts the answer in the task_queue
-                self.task_queue.put(plugin.plugin_object.tick(self.task_pool))
+                try:
+                    self.task_queue.put(plugin.plugin_object.tick(self.task_pool))
+                except:
+                    pass
 
                 #take care of Tama-addressed tasks
                 #These can be used in the future as a pipeline for getting info from elsewhere

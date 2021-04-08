@@ -11,30 +11,17 @@ import os
 import threading
 import datetime
 import random
+import mouse
 import Plugins.tama_drawer.tama_drawer_events
 from Plugins.tama_drawer.tama_drawer_events import TamaMoodEvent
 from Plugins.tama_drawer.tama_drawer_events import EVT_TAMA_MOOD
+#
+# The two tools below were acquired from the below wxPythonWiki tutorial: 
+# -- Insert Here --
+#
 import Plugins.tama_drawer.ImgConv    # wxImage <==> PilImage
 import Plugins.tama_drawer.BitmapManip  # mask wxBmap  <==> PilImage <== file
-from PIL import Image, ImageDraw, ImageChops, ImageSequence        # Pil
-
-#------------------------------------------------------------------------------
-
-"""
-On MSW the actual available client area in frameless windows seems to be 
-   [(0, 0) to (w-2, h-2)] in relation to the requesred frame size. 
-There is an unseen surrounding 1-pixel border.
-The origin of the client area is at (0, 0).
-
-A wxFrame without a frame is just a wxWwindow ! But, "wx.Window" can not
-be specified with "wx.FRAME_SHAPED" and there is no setting "wx.WINDOW_SHAPED".
-"""
-CLIENT_SIZE_ADJUST = 0      # Non-MSW platforms may need their own fudge factors.
-if wx.Platform == '__WXMSW__' :     # MSW "fudge factor", unfortunately.
-    #CLIENT_SIZE_ADJUST = 2
-    pass
-
-#------------------------------------------------------------------------------
+from PIL import Image, ImageDraw, ImageChops, ImageSequence
 
 def GetRamdomWxColorAndInverse() :
     
@@ -107,7 +94,7 @@ class TamaFrame(wx.Frame):
         self.parent = parent
         self.combined_image = wx.MemoryDC()
         self.timer = wx.Timer(self, wx.ID_ANY)
-        self.timer.Start(40)
+        self.timer.Start(60)
         self.bounding_box = parent.get_bounding_box()
         self.SetTitle('Tama')
         self.SetSize( (250, 250) )
@@ -117,8 +104,7 @@ class TamaFrame(wx.Frame):
         self.tama_widget = TamaWidget(self)
         self.previous_update = datetime.datetime.now()
         self.screenContext = None
-
-        self.is_border_window =    outer_or_inner_window
+        self.is_border_window = outer_or_inner_window
         self.is_inner_window = not outer_or_inner_window
         
         if wx.Platform == '__WXGTK__' :     # GTK-only, use as an event handler.
@@ -129,21 +115,16 @@ class TamaFrame(wx.Frame):
         
         # This handler is always required.
         self.Bind(wx.EVT_PAINT, self.OnPaint)
-
         self.Bind(wx.EVT_TIMER, self.OnTimer)
-
-        self.Bind(wx.EVT_ERASE_BACKGROUND, self.DoNothing)
-        
+        #self.Bind(wx.EVT_ERASE_BACKGROUND, self.DoNothing)
         # Enable the user to quit the app by pressing <ESC>.
         self.Bind( wx.EVT_KEY_UP, self.OnKeyDown )  # Comment this to disable.
-        self.Bind( wx.EVT_RIGHT_UP, self.ShowRightMenu )
-        
         # Enable window dragging.
         self.Bind( wx.EVT_MOTION, self.OnMotion )    # Comment this to disable.
-
         self.Bind(wx.EVT_LEFT_UP, self.OnRelease)
-
         self.Bind(wx.EVT_CLOSE, parent.OnClose)
+        #mouse.on_right_click(self.ShowRightMenu)
+        self.Bind(wx.EVT_CONTEXT_MENU, self.ShowRightMenu)
 
         #Linux and Windows will have different ways to create this kind of transparent frame.
         if wx.Platform == '__WXMSW__':
@@ -157,7 +138,8 @@ class TamaFrame(wx.Frame):
             pass
         else:
             pass
-
+        
+        #self.SetDoubleBuffered(True)
         self.Layout()
         self.Show()
 
@@ -173,14 +155,6 @@ class TamaFrame(wx.Frame):
         self.SetPosition( posn )
     #end def
     
-    #--------------------------------------------
-    
-    def SetImage(self, pil_image):
-        if pil_image:
-            width, height = pil_image.size
-            self.image_wxBitmap = wx.BitmapFromBuffer(width, height, pil_image.convert('RGB').tobytes(), pil_image.convert('RGBA').getchannel('A').tobytes())
-            return
-
     def OnPaint( self, event ) :
         self.DrawWindow()
         event.Skip()
@@ -190,9 +164,14 @@ class TamaFrame(wx.Frame):
     def DoNothing(self, event):
         pass
 
+    def SetImage(self, pil_image):
+        if pil_image:
+            width, height = pil_image.size
+            self.image_wxBitmap = wx.BitmapFromBuffer(width, height, pil_image.convert('RGB').tobytes(), pil_image.convert('RGBA').getchannel('A').tobytes())
+            return
+
     def DrawWindow( self ) :
         """Implement window drawing at any time."""
-        pos = self.GetPosition()
         # screenContext will be drawn to after memoryContext is given the right combined bitmap
         screenContext = wx.ScreenDC()
         #   Blit will copy the pixels from self.combined_image, which is a 
@@ -200,6 +179,7 @@ class TamaFrame(wx.Frame):
         #   This image is newly generated within the Tama task system, in order to
         #   reduce image display time.
         if self.image_wxBitmap and screenContext.CanDrawBitmap():
+            self.ClearBackground()
             screenContext.DrawBitmap(self.image_wxBitmap, self.GetPosition())
         del screenContext
         self.Update()
@@ -211,12 +191,50 @@ class TamaFrame(wx.Frame):
         if self.tama_widget.is_moving():
             self.move_direction(self.tama_widget.get_movement_direction())
         self.SetImage(self.tama_widget.next())
-        self.OnPaint(event)
+        self.DrawWindow()
         return
 
-    def ShowRightMenu( self, event ) :
-        wx.Exit()
-    #end def
+    def show_window_pinning(self, event):
+        self.parent.frames[2].Show()
+        return
+
+    def show_copyx(self, event):
+        self.parent.frames[3].Show()
+        return
+
+    def show_macro_recorder(self, event):
+        self.parent.frames[4].Show()
+        return
+    
+
+    def ShowRightMenu(self, *args) :
+        """
+        Create and show a Context Menu
+        """
+        # only do this part the first time so the events are only bound once 
+        if not hasattr(self, "itemOneId"):
+            self.itemOneId = wx.NewId()
+            self.itemTwoId = wx.NewId()
+            self.itemThreeId = wx.NewId()
+            self.itemFourId = wx.NewId()
+            self.itemFiveId = wx.NewId()
+            self.Bind(wx.EVT_MENU, self.show_window_pinning, id=self.itemOneId)
+            self.Bind(wx.EVT_MENU, self.show_copyx, id=self.itemTwoId)
+            self.Bind(wx.EVT_MENU, self.show_macro_recorder, id=self.itemThreeId)
+            #self.Bind(wx.EVT_MENU, self.show_tama_stats, id=self.itemFourId)
+            self.Bind(wx.EVT_MENU, self.parent.OnClose, id=self.itemFiveId)
+ 
+        # build the menu
+        menu = wx.Menu()
+        itemOne = menu.Append(self.itemOneId, "Pin a Window...")
+        itemTwo = menu.Append(self.itemTwoId, "Copy X...")
+        itemThree = menu.Append(self.itemThreeId, "Record Mouse Events...")
+        itemFour = menu.Append(self.itemFourId, "Show Stats... (Not Available)")
+        itemFive = menu.Append(self.itemFiveId, "Exit")
+ 
+        # show the popup menu
+        self.PopupMenu(menu)
+        menu.Destroy()
     
     def OnKeyDown( self, event ) :
         """Quit the app if the user presses Q, q or Esc"""
@@ -247,14 +265,16 @@ class TamaFrame(wx.Frame):
             # Capture the first mouse coord after pressing any button
             self.dragPosn = event.GetPosition()
         else:
-            self.tama_widget.is_grabbed(True)
+            if not self.tama_widget.is_grabbed():
+                self.tama_widget.is_grabbed(True)
             currPosn = event.GetPosition()
-            displacement = self.dragPosn - currPosn     # always nonzero
+            displacement = self.dragPosn - currPosn
             newPosn = self.GetPosition() - displacement
             self.SetPosition( newPosn )
-            self.DrawWindow()
+            
         #end if
-        
+        self.Update()
+        self.DrawWindow()
         event.Skip()
 
     def move_direction(self, dir):
@@ -273,11 +293,14 @@ class TamaFrame(wx.Frame):
                 pass
         else:
             pass
+        self.Update()
         self.DrawWindow()
 
     def OnRelease(self, event):
         if self.tama_widget.is_grabbed():
+            self.ClearBackground()
             self.tama_widget.is_grabbed(False)
+        self.DrawWindow()
 
     def needs_update(self):
         return self.tama_widget.needs_update()
@@ -299,14 +322,16 @@ class TamaFrame(wx.Frame):
             self.tama_widget.set_animation('Thinking_of_Food')
         else:
             self.tama_widget.set_animation('Idle')
+        self.DrawWindow()
         return
 
     def set_current_mood(self, current_mood):
         self.tama_widget.set_current_mood(current_mood)
+        self.Show()
         return
 
     def OnClose(self, e):
-        self.Destroy()
+        e.Skip()
 
 class TamaWidget():
     """
@@ -421,13 +446,9 @@ class TamaWidget():
     def set_animation(self, anim_name):
         #This has to happen every time set_animation is called, or indices will go out of range when calling self.next()
         self.frame_idx = 0
-        
         if self.is_grabbed():
             #in the future, we can set a grabbed + anim_name animation here, and rotate the animation on user drag.
             anim_name = 'Grabbed'
-            self.prev_animation = anim_name
-            self.is_moving(False, None)
-            return
         if not self.is_moving() and random.randrange(0, 10) == 0:
             dir = random.randint(0,1)
             self.is_moving(True, dir)
@@ -475,5 +496,5 @@ class TamaWidget():
                     frame.save(path_to_frame, **gif_info)
                     self.current_animation.append(Image.open(path_to_frame))
                     self.animation_duration += 1
-
-            return
+        
+        return

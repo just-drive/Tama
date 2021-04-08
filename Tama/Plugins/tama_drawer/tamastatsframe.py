@@ -52,7 +52,7 @@ class TamaStatsFrame(wx.Frame):
         #else:
         #    pass
 
-        self.Hide()
+        self.Show()
 
     #This frame will update every time a mood is received, as Tama's stats are constantly changing.
     def needs_update(self):

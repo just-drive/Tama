@@ -33,14 +33,16 @@
     <Compile Include="Plugins\basic_needs\__init__.py" />
     <Compile Include="Plugins\cli\__init__.py" />
     <Compile Include="Plugins\tama_drawer\BitmapManip.py" />
-    <Compile Include="Plugins\tama_drawer\FANCY_SHAPED_WINDOW.PY" />
+    <Compile Include="Plugins\tama_drawer\copy_x.py" />
     <Compile Include="Plugins\tama_drawer\ImgConv.py" />
+    <Compile Include="Plugins\tama_drawer\macro_recorder.py" />
     <Compile Include="Plugins\tama_drawer\tamadrawer.py" />
     <Compile Include="Plugins\tama_drawer\tama_drawer_events.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Plugins\tama_drawer\tamastatsframe.py" />
     <Compile Include="Plugins\tama_drawer\tamaframe.py" />
+    <Compile Include="Plugins\tama_drawer\window_pinning.py" />
     <Compile Include="Tama.py" />
     <Compile Include="task.py" />
   </ItemGroup>
