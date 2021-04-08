@@ -29,7 +29,6 @@ class Tama(wx.App):
     """
     The Tama object inherits from wx.App and is capable of multiprocessing.
     Template code for multiprocessing handling is incorporated from https://wiki.wxpython.org/MultiProcessing
-    
     """
     def __init__(self, processes=[ ], task_queue=[ ]):
         #see wx.App __init__ function for the following statement
