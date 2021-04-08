@@ -138,3 +138,8 @@ dmypy.json
 
 #Tama should ignore this, as every file should be deleted out of it anyways.
 Food Bowl
+/Tama/Assets
+/Tama/Plugins/tama_drawer/Assets/Grabbed/Gen
+/Tama/Plugins/tama_drawer/Assets/Idle/Gen
+/Tama/Plugins/tama_drawer/Assets/Move Left/Gen
+/Tama/Plugins/tama_drawer/Assets/Move Right/Gen
