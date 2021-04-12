@@ -40,10 +40,10 @@ class Tama(wx.App):
         self.task_queue = task_queue
         self.alive = True
         self.app = wx.App()
-        self.timer = wx.Timer(self.app, 0)
+        self.timer = wx.Timer(self.app, wx.ID_ANY)
         self.start_time = datetime.now()
         self.app.Bind(wx.EVT_TIMER, self.OnTimer)
-        self.timer.Start(20)
+        self.timer.Start(80)
         self.time_delta = timedelta()
         
 
@@ -61,82 +61,51 @@ class Tama(wx.App):
             print("{} plugin activated.".format(pluginInfo.name))
 
     def OnTimer(self, event):
-        #You can use a get_time_delta task to recieve a timedelta object, which can then be
-        #used to perform tasks at a set rate over time, such as gui refreshes, animation, 
-        #setting something on a timer, etc.
-        self.time_delta = datetime.now() - self.start_time
+        if self.app:
+            #You can use a get_time_delta task to recieve a timedelta object, which can then be
+            #used to perform tasks at a set rate over time, such as gui refreshes, animation, 
+            #setting something on a timer, etc.
+            self.time_delta = datetime.now() - self.start_time
 
-        for plugin in self.plugin_manager.getAllPlugins():
-            
-            self.task_queue.put(plugin.plugin_object.tick(self.task_pool))
+            for plugin in self.plugin_manager.getAllPlugins():
+                
+                # calls the current plugin's tick() and passes it the task_pool, 
+                # then puts the answer in the task_queue
+                try:
+                    self.task_queue.put(plugin.plugin_object.tick(self.task_pool))
+                except:
+                    pass
 
-            #take care of Tama-addressed tasks
-            #These can be used in the future as a pipeline for getting info from elsewhere
-            #but they will be blocking operations for now.
-            for idx in task.find_tasks('Tama', self.task_pool):
-                item = self.task_pool.pop(idx)
-                self.task_pool.insert(idx, self.work_task(item))
-            else:
-                #purge the task pool of 
-                #- non-tasks,
-                #- tasks containing a 'REMOVE' result
-                #- tasks not addressed to a valid plugin
-                #
-                #In order to prevent accidental appends from
-                #causing task pool to grow too big with useless data.
-                for item in self.task_pool:
-                    if not task.is_valid_task(item):
-                        self.task_pool.remove(item)
-                    elif item.get_result() == 'REMOVE':
-                        self.task_pool.remove(item)
-                    elif item.get_result() == 'EXIT TAMA':
-                        self.task_pool.remove(item)
-                        self.alive = False
-                    #I love python cause you can do stuff like this succinctly
-                    elif item.get_plugin() not in [plugin.name for plugin in self.plugin_manager.getAllPlugins()] \
-                        and item.get_plugin != 'Tama':
-                        self.task_pool.remove(item)
+                #take care of Tama-addressed tasks
+                #These can be used in the future as a pipeline for getting info from elsewhere
+                #but they will be blocking operations for now.
+                for idx in task.find_tasks('Tama', self.task_pool):
+                    item = self.task_pool.pop(idx)
+                    self.task_pool.insert(idx, self.work_task(item))
+                else:
+                    #purge the task pool of 
+                    #- non-tasks,
+                    #- tasks containing a 'REMOVE' result
+                    #- tasks not addressed to a valid plugin
+                    #
+                    #In order to prevent accidental appends from
+                    #causing task pool to grow too big with useless data.
+                    for item in self.task_pool:
+                        if not task.is_valid_task(item):
+                            self.task_pool.remove(item)
+                        elif item.get_result() == 'REMOVE':
+                            self.task_pool.remove(item)
+                        elif item.get_result() == 'EXIT TAMA':
+                            self.task_pool.remove(item)
+                            self.alive = False
+                        #I love python cause you can do stuff like this succinctly
+                        elif item.get_plugin() not in [plugin.name for plugin in self.plugin_manager.getAllPlugins()] \
+                            and item.get_plugin != 'Tama':
+                            self.task_pool.remove(item)
 
-    # [task] create_tama_frames(self, args)
-    # args[0] is the name to be associated with the panel, unique, as per dictionary rules.
-    # args[1] is an AuiPaneInfo object if supplied by the plugin
-    def create_tama_frame(self, args):
-        # args[0] Will be the pane name to use in the panes dictionary
-        # if it's blank, return None.
-        if args[0] is None:
-            return None
-        
-        new_frame = None
-        # if args[1] is None, create a AuiPaneInfo object and use it to create a floating frame
-        # for the pane_manager to handle
-        if args[1] is None:
-            new_frame = aui.AuiFloatingFrame()
-        # else use the AuiPaneInfo object to create the pane
-        else:
-            pass
-        
-        # and then insert it into the manager
-        pane_manager.AddPane(new_frame)
-        return 
-
-    # [task] remove_tama_frame(self, args)
-    # Will eventually remove a frame from the frame array, as well as handle any OnExit Events
-    # that occur in a frame.
-    def remove_tama_frame(self, args):
-        pass
-
-    # [task]update_tama_frames(self)
-    # Adds an update_tama_frames() task to the task_pool for every plugin
-    # that is using wxPython to generate graphics.
-    #
-    # Receives these tasks when they are sent back with a wxPython Frame as args[0]
-    # Replaces the current frame owned by /plugin.name/ with the new Frame
-    #
-    # Will eventually handle updating the Frames that have been initiated
-    # it will do this by creating a task with feedback required for each 
-    # plugin that creates a frame and needs to update it.
-    def update_tama_frames(self, args):
-        pass
+        if self.alive:
+            #Call this again in 80ms if Tama is alive
+            self.timer.StartOnce(80)
 
     def get_tama_path(self, args):
         return self.TamaPath
@@ -144,10 +113,15 @@ class Tama(wx.App):
     def get_time_delta(self, args):
         return self.time_delta
 
+    def shutdown(self, args):
+        self.timer.Stop()
+        self.app.SetExitOnFrameDelete(True)
+        self.app.GetTopWindow().Close()
+
     def die(self, args):
         end_time = datetime.now()
         print("Tama lived for {} seconds".format((end_time - self.start_time).total_seconds()))
-        self.task_pool = [task('Tama', False, 'Tama', 'shutdown')]
+        self.task_pool = [task('Tama', False, 'Tama', 'shutdown', [])]
 
     """
     TODO: Write this function, find a good, modular way to add tasks to the task pool at their appointed times
@@ -224,7 +198,7 @@ class Tama(wx.App):
                 sender = task.get_sender()
                 task.set_sender(task.get_plugin())
                 task.set_plugin(sender)
-            else:
+            elif task.get_result() != 'EXIT TAMA':
                 task.set_result('REMOVE')
         return task
 
@@ -244,6 +218,7 @@ class Tama(wx.App):
 if __name__ == "__main__":
     multiproc.freeze_support()
     # Determine the number of CPU's/cores
+    # This uses the number of logical cores, not physical.
     numproc = multiproc.cpu_count()
     
     # Create the queues
@@ -252,10 +227,26 @@ if __name__ == "__main__":
     processes = [ ]
     
     # The worker processes must be started before initializing Tama.
-    for n in range(numproc):
-        process = multiproc.Process(target=Tama.worker, args=[task_queue])
-        process.start()
-        processes.append(process)
+    # 
+    # n = n ^ 3 yields a series of n cubed from n = 0 to n = number of logical processors in user OS
+    # if n cubed is greater than the number of logical processors, then the loop breaks and the program may begin.
+    # 0, 1, 8, 27, 64, 125...
 
+    # 4 logical cores = 2 processes to bounce back and forth
+    # 8 logical cores = 3 processes...
+    # 16 cores = 3 processes...
+    # 32 cores = 4 processes...
+    # 64 cores = 5 processes...
+    for n in range(numproc):
+        n = n * n * n
+        print(n)
+        if n <= numproc:
+            process = multiproc.Process(target=Tama.worker, args=[task_queue])
+            process.start()
+            processes.append(process)
+        else:
+            break
+        
+    print(len(processes))
     tama = Tama(processes=processes, task_queue=task_queue)
     tama.MainLoop()
