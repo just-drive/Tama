@@ -95,8 +95,6 @@ class BasicNeeds(IPlugin):
         #this process can be seen by looking at set_tama_path
         self.eating_system = None
 
-        return
-
     def check_if_alive(self):
         '''
         Returns true if Tama's health is above 0
@@ -149,7 +147,6 @@ class BasicNeeds(IPlugin):
             self.health = self.health_max
         elif self.health < 0:
             self.health = 0
-        return
     
     def calc_rates(self):
         mood = self.current_mood
@@ -164,57 +161,57 @@ class BasicNeeds(IPlugin):
         #This ensures that the same mood will result in the same rates later, while also allowing interplay between moods
         
         #Happiness directly affects energy and health
-        if mood.get('Conditions').get('Happiness') == "Ecstatic":
+        if mood["Happiness"] == "Ecstatic":
             energy_rate += -0.5
             health_rate += 0.5
-        elif mood.get('Conditions').get('Happiness') == "Happy":
+        elif mood["Happiness"] == "Happy":
             energy_rate += -0.3
-        elif mood.get('Conditions').get('Happiness') == "Sad":
+        elif mood["Happiness"] == "Sad":
             energy_rate += -0.5
-        elif mood.get('Conditions').get('Happiness') == "Depressed":
+        elif mood["Happiness"] == "Depressed":
             energy_rate += -0.8
             health_rate += -0.5
 
         #Satiation directly affects happiness,
         #Eating restores satiation and health
-        if mood.get('Conditions').get('Satiation') == "Full":
+        if mood["Satiation"] == "Full":
             happiness_rate += .5
-        elif mood.get('Conditions').get('Satiation') == "Sated":
+        elif mood["Satiation"] == "Sated":
             happiness_rate += .3
-        elif mood.get('Conditions').get('Satiation') == "Hungry":
+        elif mood["Satiation"] == "Hungry":
             happiness_rate += -.1
             health_rate += -.1
-        elif mood.get('Conditions').get('Satiation') == "Starving":
+        elif mood["Satiation"] == "Starving":
             happiness_rate += -.5
             health_rate += -.5
 
         #Energy directly affects satiation
-        if mood.get('Conditions').get('Energy') == "Excited":
+        if mood["Energy"] == "Excited":
             satiation_rate += -0.8
-        elif mood.get('Conditions').get('Energy') == "Playful":
+        elif mood["Energy"] == "Playful":
             satiation_rate += -0.5
-        elif mood.get('Conditions').get('Energy') == "Tired":
+        elif mood["Energy"] == "Tired":
             satiation_rate += -0.1
-        elif mood.get('Conditions').get('Energy') == "Sleeping":
+        elif mood["Energy"] == "Sleeping":
             satiation_rate += 0
 
         #Health directly affects energy and happiness
-        if mood.get('Conditions').get('Health') == "Pristeen":
+        if mood["Health"] == "Pristeen":
             energy_rate += .3
             happiness_rate += .1
-        elif mood.get('Conditions').get('Health') == "Healthy":
+        elif mood["Health"] == "Healthy":
             energy_rate += .1
-        elif mood.get('Conditions').get('Health') == "Unhealthy":
+        elif mood["Health"] == "Unhealthy":
             energy_rate += -.2
             happiness_rate += -.2
-        elif mood.get('Conditions').get('Health') == "Sick":
+        elif mood["Health"] == "Sick":
             energy_rate += -.8
             happiness_rate += -.5
 
         #modifiers change how rates work
-        if "Eating" in mood.get('Modifiers'):
+        if "Eating" in mood["Modifiers"]:
             health_rate += 1
-        if "Sleeping" in mood.get('Modifiers'):
+        if "Sleeping" in mood["Modifiers"]:
             energy_rate = 0
             happiness_rate = 0
             health_rate += 1
@@ -227,7 +224,6 @@ class BasicNeeds(IPlugin):
         self.satiation_rate = satiation_rate
         self.energy_rate = energy_rate
         self.health_rate = health_rate
-        return
         
     def get_current_mood(self, args):
         return self.current_mood
@@ -256,30 +252,16 @@ class BasicNeeds(IPlugin):
                 health_mood = key
 
         if self.current_mood is not None:
-            if self.current_mood.get('Modifiers') is not None:
-                modifiers = self.current_mood.get('Modifiers')
+            if self.current_mood["Modifiers"] is not None:
+                modifiers = self.current_mood["Modifiers"]
         else:
             modifiers = []
         #Zeroes cause the above for loops to not assign a key to a mood, if so, default to lowest mood
         self.current_mood = {
-            "Conditions": {
-                "Happiness": happiness_mood if happiness_mood is not None else 'Depressed', 
-                "Satiation": satiation_mood if satiation_mood is not None else 'Starving', 
-                "Energy": energy_mood if energy_mood is not None else 'Sleeping', 
-                "Health": health_mood if health_mood is not None else 'Sick'
-            },
-            "Stats": {
-                "Happiness": self.happiness, 
-                "Satiation": self.satiation,
-                "Energy": self.energy, 
-                "Health": self.health
-            },
-            "Max": {
-                "Happiness": self.happiness_max, 
-                "Satiation": self.satiation_max,
-                "Energy": self.energy_max, 
-                "Health": self.health_max
-            },
+            "Happiness": happiness_mood if happiness_mood is not None else 'Depressed', 
+            "Satiation": satiation_mood if satiation_mood is not None else 'Starving', 
+            "Energy": energy_mood if energy_mood is not None else 'Sleeping', 
+            "Health": health_mood if health_mood is not None else 'Sick',
             "Modifiers": modifiers
         }
         return self.current_mood
@@ -317,7 +299,6 @@ class BasicNeeds(IPlugin):
         if self.food_bowl is None:
             os.mkdir(os.path.join(self.tama_path, "Food Bowl"))
             self.food_bowl = os.path.join(self.tama_path, "Food Bowl")
-        return
 
     def get_tama_path(self, path):
         """
@@ -376,26 +357,26 @@ class BasicNeeds(IPlugin):
 
         #Now take care of eating, Tama cannot eat while sleeping.
         if self.current_mood is not None:
-            if self.current_mood.get('Conditions').get('Energy') != 'Sleeping':
-                if self.current_mood.get('Conditions').get('Satiation') == 'Sated' \
-                or self.current_mood.get('Conditions').get('Satiation') == 'Hungry' \
-                or self.current_mood.get('Conditions').get('Satiation') == 'Starving':
+            if self.current_mood['Energy'] != 'Sleeping':
+                if self.current_mood['Satiation'] == 'Sated' \
+                or self.current_mood['Satiation'] == 'Hungry' \
+                or self.current_mood['Satiation'] == 'Starving' :
                     prev_hunger = self.satiation
                     self.satiation += self.eating_system.eat()
 
                     #if satiation didn't go up after the eat call, Tama is not eating,
                     #and if it did, tama is eating.
                     if self.satiation <= prev_hunger:
-                        if 'Eating' in self.current_mood.get('Modifiers'):
-                            self.current_mood.get('Modifiers').remove('Eating')
+                        if 'Eating' in self.current_mood["Modifiers"]:
+                            self.current_mood["Modifiers"].remove('Eating')
                         #Tama will only think of food when hungry or starving.
-                        if ('Hungry' or 'Starving' in self.current_mood.get('Conditions').get('Satiation')) \
-                            and ('Thinking_of_Food' not in self.current_mood.get('Modifiers')):
-                            self.current_mood.get('Modifiers').append('Thinking_of_Food')
+                        if ('Hungry' or 'Starving' in str(self.current_mood["Satiation"])) \
+                            and ('Thinking_of_Food' not in self.current_mood['Modifiers']):
+                            self.current_mood['Modifiers'].append('Thinking_of_Food')
                     else:
-                        if 'Thinking_of_Food' in self.current_mood.get('Modifiers'):
-                            self.current_mood.get('Modifiers').remove('Thinking_of_Food')
-                            self.current_mood.get('Modifiers').append('Eating')
+                        if 'Thinking_of_Food' in self.current_mood["Modifiers"]:
+                            self.current_mood["Modifiers"].remove('Thinking_of_Food')
+                            self.current_mood['Modifiers'].append('Eating')
 
                     #finally make sure satiation completes within bounds
                     if self.satiation > self.satiation_max:
@@ -423,6 +404,17 @@ class BasicNeeds(IPlugin):
             for idx in idxlist:
                 item = task_pool.pop(idx)
                 task_pool.insert(idx, self.work_task(item))
+            #this print statement is for debugging purposes only
+            print_str = 'Happiness: {} - {}, Satiation: {} - {}, Energy: {} - {}, Health: {} - {}               '.format(
+                    self.current_mood["Happiness"],
+                    round(self.happiness),
+                    self.current_mood["Satiation"],
+                    round(self.satiation),
+                    self.current_mood["Energy"],
+                    round(self.energy),
+                    self.current_mood["Health"],
+                    round(self.health))
+            print(print_str)
             return task_pool
         #If self.calculate_needs() returns false, then tama dies, and this is all that can be run.
         else:

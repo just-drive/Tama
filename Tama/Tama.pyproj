@@ -15,8 +15,6 @@
     <TestFramework>unittest</TestFramework>
     <UnitTestPattern>test*.py</UnitTestPattern>
     <UnitTestRootDirectory>.Tests</UnitTestRootDirectory>
-    <LaunchProvider>Standard Python launcher</LaunchProvider>
-    <EnableNativeCodeDebugging>False</EnableNativeCodeDebugging>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>
@@ -32,17 +30,8 @@
     <Compile Include="Plugins\basic_needs\basicneeds.py" />
     <Compile Include="Plugins\basic_needs\__init__.py" />
     <Compile Include="Plugins\cli\__init__.py" />
-    <Compile Include="Plugins\tama_drawer\BitmapManip.py" />
-    <Compile Include="Plugins\tama_drawer\copy_x.py" />
-    <Compile Include="Plugins\tama_drawer\ImgConv.py" />
-    <Compile Include="Plugins\tama_drawer\macro_recorder.py" />
     <Compile Include="Plugins\tama_drawer\tamadrawer.py" />
-    <Compile Include="Plugins\tama_drawer\tama_drawer_events.py">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Plugins\tama_drawer\tamastatsframe.py" />
     <Compile Include="Plugins\tama_drawer\tamaframe.py" />
-    <Compile Include="Plugins\tama_drawer\window_pinning.py" />
     <Compile Include="Tama.py" />
     <Compile Include="task.py" />
   </ItemGroup>
@@ -55,16 +44,14 @@
     <Folder Include="Plugins\tama_drawer\Assets\" />
     <Folder Include="Plugins\tama_drawer\Assets\Eating\" />
     <Folder Include="Plugins\tama_drawer\Assets\Idle\" />
-    <Folder Include="Plugins\tama_drawer\Assets\Grabbed\" />
-    <Folder Include="Plugins\tama_drawer\Assets\Move Right\" />
-    <Folder Include="Plugins\tama_drawer\Assets\Move Left\" />
-    <Folder Include="Plugins\tama_drawer\Assets\Falling\" />
     <Folder Include="Plugins\tama_drawer\Assets\Sleeping\" />
     <Folder Include="Plugins\tama_drawer\Assets\Startup\" />
     <Folder Include="Plugins\tama_drawer\Assets\Thinking_of_Food\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="assets\booger_boy_2.png" />
+    <Content Include="Plugins\tama_drawer\Assets\Eating\booger_boy_slobber.png" />
+    <Content Include="Plugins\tama_drawer\Assets\Idle\booger_boy_2.png" />
     <Content Include="Assets\booger_boy_2_wall_smoosh_right.png" />
     <Content Include="Assets\booger_boy_hungry_tans_code.png" />
     <Content Include="Assets\booger_boy_sad.png" />
@@ -75,13 +62,7 @@
     <Content Include="assets\helloworld.html" />
     <Content Include="Plugins\basic_needs\basicneeds.yapsy-plugin" />
     <Content Include="Plugins\cli\cli.yapsy-plugin" />
-    <Content Include="Plugins\tama_drawer\Assets\Eating\Tama_Eating_1.gif" />
-    <Content Include="Plugins\tama_drawer\Assets\Grabbed\Tama_Grabbed_1.gif" />
-    <Content Include="Plugins\tama_drawer\Assets\Idle\Idle_0.gif" />
-    <Content Include="Plugins\tama_drawer\Assets\Idle\Tama_Idle_2.gif" />
-    <Content Include="Plugins\tama_drawer\Assets\Idle\Tama_Idle_3.gif" />
-    <Content Include="Plugins\tama_drawer\Assets\Move Left\Tama_Move_Left_1.gif" />
-    <Content Include="Plugins\tama_drawer\Assets\Move Right\Tama_Move_Right_1.gif" />
+    <Content Include="Plugins\tama_drawer\Assets\Thinking_of_Food\booger_boy_hungry_tans_code.png" />
     <Content Include="Plugins\tama_drawer\tamadrawer.yapsy-plugin" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
