@@ -6,7 +6,7 @@ import wx.adv as adv
 import json
 import threading
 import time
-import webbrowswer
+import webbrowser
 from win32ctypes.pywin32 import win32api
 import win32.lib.win32con as win32con
 import win32.win32gui as win32gui
@@ -101,7 +101,7 @@ class TamaDrawer(IPlugin, wx.Frame):
                 WindowPinning(self),
                 CopyX(),
                 MacroRecorder(),
-                Settings(None)
+                Settings()
                 
             ]
         for frame in self.frames:
