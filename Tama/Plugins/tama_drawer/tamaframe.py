@@ -217,7 +217,11 @@ class TamaFrame(wx.Frame):
     def show_macro_recorder(self, event):
         self.parent.frames[4].Show()
         return
-    
+
+    def show_settings(self, event):
+        self.parent.frames[5].Show()
+        return
+
     def ShowRightMenu(self, *args) :
         """
         Create and show a Context Menu
@@ -232,7 +236,7 @@ class TamaFrame(wx.Frame):
             self.Bind(wx.EVT_MENU, self.show_window_pinning, id=self.itemOneId)
             self.Bind(wx.EVT_MENU, self.show_copyx, id=self.itemTwoId)
             self.Bind(wx.EVT_MENU, self.show_macro_recorder, id=self.itemThreeId)
-            self.Bind(wx.EVT_MENU, self.settings, id=self.itemFourId)
+            self.Bind(wx.EVT_MENU, self.show_settings, id=self.itemFourId)
             self.Bind(wx.EVT_MENU, self.parent.OnClose, id=self.itemFiveId)
  
         # build the menu
