@@ -179,8 +179,8 @@ class Tama(wx.App):
         elif args[0] == 4:
             pass
 
-    def create_app(self):
-        app = Tama(redirect=True, filename='wxsimpler_mp.stderr.log', processes=Processes, taskqueue=taskQueue, donequeue=doneQueue, tasks=Tasks)
+    #def create_app(self):
+    #    app = Tama(redirect=True, filename='wxsimpler_mp.stderr.log', processes=Processes, taskqueue=taskQueue, donequeue=doneQueue, tasks=Tasks)
 
     def work_task(self, task):
         if task.is_done():
@@ -209,7 +209,7 @@ class Tama(wx.App):
         while True:
             try:
                 args = input.get_nowait()
-                self.task_pool.append(work_task(args[0]))
+                self.task_pool.append(self.work_task(args[0]))
             except:
                 pass
 

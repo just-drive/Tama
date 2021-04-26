@@ -12,6 +12,7 @@ import threading
 import datetime
 import random
 import mouse
+from screeninfo import get_monitors
 import Plugins.tama_drawer.tama_drawer_events
 from Plugins.tama_drawer.tama_drawer_events import TamaMoodEvent
 from Plugins.tama_drawer.tama_drawer_events import EVT_TAMA_MOOD
@@ -78,27 +79,40 @@ class TamaFrame(wx.Frame):
     """
     def __init__( self, parent, image_filename=None, mask_filename=None, 
                         outer_or_inner_window=1,            # default to a shaped frame window
-                        posn=(0, 0), bgTransparency=0 ) :
-        style = ( wx.STAY_ON_TOP | wx.FRAME_SHAPED )
+                        posn=(0, 0), bgTransparency=100 ) :
+        style = ( wx.STAY_ON_TOP )
         """
         The TamaFrame inherits from wx.Frame, and thus receives the ability to be used in a wxpython (wx) app
         This is the window that is created for the application, Tama's actual form will be inside of this frame,
         and the frame itself is only slightly visible (This can be tweaked).
         """        
-        wx.Frame.__init__(self, parent, wx.ID_ANY, style=style, title = 'Tama', name = 'Tama') 
-        self.SetPosition( posn )
+        wx.Frame.__init__(self, parent, wx.ID_ANY, style=style, title = 'Tama', name = 'Tama')
         self.bgTransparency = bgTransparency
         self.SetBackgroundStyle(wx.BG_STYLE_ERASE)
         self.image_filename = image_filename
-        self.image_wxBitmap = None
+        self.image_wxBitmaps = []
         self.parent = parent
-        self.combined_image = wx.MemoryDC()
+        self.current_bitmap = None
         self.timer = wx.Timer(self, wx.ID_ANY)
         self.timer.Start(60)
-        self.bounding_box = parent.get_bounding_box()
+        #Will be used to get locations of screens, so that the correct
+        #screen is drawn to when drawing with a ScreenDC
+        self.screens = []
+        self.screen_positions = []
+        for screen in get_monitors():
+            self.screens.append(screen)
+        #Bounding_boxes is a list of rect objects where bounding_boxes[0]
+        #Represents the client size of screen[0]
+        #This will be used to draw with a ScreenDC, which considers all
+        #monitors to be one screen.
+        self.bounding_boxes = []
+        for screen_idx in range(len(self.screens)):
+            self.bounding_boxes.append(wx.Display(screen_idx).GetClientArea())
+            
         self.SetTitle('Tama')
         self.SetSize( (250, 250) )
-        self.SetPosition( parent.DoGetPosition() )
+        self.current_screen = wx.Display().GetFromPoint((self.bounding_boxes[0].GetX(), self.bounding_boxes[0].GetY()))
+        self.SetPosition((self.bounding_boxes[0].GetX(), self.bounding_boxes[0].GetY()))
         self.current_mood = None
         self.last_mouse_pos = wx.Point(0,0)
         self.tama_widget = TamaWidget(self)
@@ -132,14 +146,14 @@ class TamaFrame(wx.Frame):
             extendedStyleSettings = win32gui.GetWindowLong(hwnd, win32con.GWL_EXSTYLE)
             win32gui.SetWindowLong(hwnd, win32con.GWL_EXSTYLE, extendedStyleSettings  | win32con.WS_EX_LAYERED | win32con.WS_CHILD)
             win32gui.SetLayeredWindowAttributes(hwnd, 0, 255, win32con.LWA_COLORKEY)
-            self.SetTransparent(1)
+            self.SetTransparent(190)
             
         elif wx.Platform == '__WXGTK__':
             pass
         else:
             pass
         
-        #self.SetDoubleBuffered(True)
+        self.SetDoubleBuffered(True)
         self.Layout()
         self.Show()
 
@@ -167,31 +181,29 @@ class TamaFrame(wx.Frame):
     def SetImage(self, pil_image):
         if pil_image:
             width, height = pil_image.size
-            self.image_wxBitmap = wx.BitmapFromBuffer(width, height, pil_image.convert('RGB').tobytes(), pil_image.convert('RGBA').getchannel('A').tobytes())
+            self.image_wxBitmaps.append(wx.BitmapFromBuffer(width, height, pil_image.convert('RGB').tobytes(), pil_image.convert('RGBA').getchannel('A').tobytes()))
             return
 
-    def DrawWindow( self ) :
+    def DrawWindow(self) :
         """Implement window drawing at any time."""
         # screenContext will be drawn to after memoryContext is given the right combined bitmap
-        screenContext = wx.ScreenDC()
+        context = wx.PaintDC(self)
         #   Blit will copy the pixels from self.combined_image, which is a 
         #   MemoryDC that contains the current Tama Image to be displayed.
         #   This image is newly generated within the Tama task system, in order to
         #   reduce image display time.
-        if self.image_wxBitmap and screenContext.CanDrawBitmap():
-            self.ClearBackground()
-            screenContext.DrawBitmap(self.image_wxBitmap, self.GetPosition())
-        del screenContext
-        self.Update()
+        if len(self.image_wxBitmaps) and context.CanDrawBitmap():
+            context.DrawBitmap(self.image_wxBitmaps.pop(), 0, 0, False)
+        del context
     #end def DrawWindow
     
     #--------------------------------------------
     
     def OnTimer(self, event):
-        if self.tama_widget.is_moving():
-            self.move_direction(self.tama_widget.get_movement_direction())
+        if not self.tama_widget.is_grabbed() and self.tama_widget.is_moving():
+            self.move_direction()
         self.SetImage(self.tama_widget.next())
-        self.DrawWindow()
+        self.Refresh()
         return
 
     def show_window_pinning(self, event):
@@ -271,39 +283,38 @@ class TamaFrame(wx.Frame):
             if not self.tama_widget.is_grabbed():
                 self.tama_widget.is_grabbed(True)
             currPosn = event.GetPosition()
+            self.current_screen = wx.Display().GetFromWindow(self)
             displacement = self.dragPosn - currPosn
             newPosn = self.GetPosition() - displacement
             self.SetPosition( newPosn )
-            
-        #end if
-        self.Update()
-        self.DrawWindow()
-        event.Skip()
+            self.Update()
 
-    def move_direction(self, dir):
-        if dir == 0:
-            if self.bounding_box.Contains(wx.Point(self.DoGetPosition()[0], self.DoGetPosition()[1])):
-                self.SetPosition(wx.Point(self.DoGetPosition()[0]-2, self.DoGetPosition()[1]))
+    def move_direction(self):
+        window_pos = self.GetScreenPosition()
+        if self.tama_widget.is_moving():
+            #box represents the client area of the current screen that Tama is located on.
+            #and the upper left corner does not have to be 0,0
+            box = self.bounding_boxes[self.current_screen]
+            if self.tama_widget.get_movement_direction() == 'Move Left':
+                if self.bounding_boxes[self.current_screen].Contains(
+                wx.Point(window_pos[0]-2, window_pos[1])):
+                    self.SetPosition(wx.Point(window_pos[0]-2, window_pos[1]))
+                else:
+                    self.tama_widget.is_moving(False)
+                    
+            elif self.tama_widget.get_movement_direction() == 'Move Right':
+                if self.bounding_boxes[self.current_screen].Contains(
+                wx.Point(window_pos[0] + self.GetSize().GetWidth(), window_pos[1])):
+                    self.SetPosition(wx.Point(window_pos[0]+2, window_pos[1]))
+                else:
+                    self.tama_widget.is_moving(False)
             else:
                 pass
-        elif dir == 1:
-            if self.bounding_box.Contains(wx.Point(self.DoGetPosition()[0]+250, self.DoGetPosition()[1])):
-                self.SetPosition(wx.Point(self.DoGetPosition()[0]+2, self.DoGetPosition()[1]))
-            else:
-                pass
-        elif dir == 2:
-            if self.bounding_box.Contains(wx.Point(self.DoGetPosition()[0], self.DoGetPosition()[1]+250)):
-                pass
-        else:
-            pass
         self.Update()
-        self.DrawWindow()
 
     def OnRelease(self, event):
         if self.tama_widget.is_grabbed():
-            self.ClearBackground()
             self.tama_widget.is_grabbed(False)
-        self.DrawWindow()
 
     def needs_update(self):
         return self.tama_widget.needs_update()
@@ -325,13 +336,16 @@ class TamaFrame(wx.Frame):
             self.tama_widget.set_animation('Thinking_of_Food')
         else:
             self.tama_widget.set_animation('Idle')
-        self.DrawWindow()
+        self.Refresh()
         return
 
     def set_current_mood(self, current_mood):
         self.tama_widget.set_current_mood(current_mood)
         self.Show()
         return
+
+    def get_bounding_boxes(self):
+        return self.bounding_boxes
 
     def OnClose(self, e):
         e.Skip()
@@ -344,7 +358,6 @@ class TamaWidget():
     def __init__(self, parent):
         self.assets_folder = os.path.join(os.path.dirname(os.path.abspath(__file__)), "Assets")
         self.parent = parent
-        self.bounding_box = parent.bounding_box
         self.available_folders = []
         self.current_mood = None
         self.animation_duration = 0
@@ -356,6 +369,7 @@ class TamaWidget():
         #GenericAnimationCtrl is used here in order to detect when an animation is done playing.
         self.current_gif = Image.open(self.idle_animation_path)
         self.current_animation = []
+        self.prev_animation = None
         self.grabbed = False
         self.moving = False
         self.direction = None
@@ -400,13 +414,25 @@ class TamaWidget():
         
         if ishe is None:
             return self.grabbed
+        
         self.grabbed = ishe
-        if ishe:
-            self.prev_animation = self.current_animation_name
-            self.set_animation('Grabbed')
+        if self.is_moving():
+            if ishe == True:
+                if 'Move' not in self.current_animation_name \
+                and 'Grabbed' not in self.current_animation_name:
+                    self.prev_animation = self.current_animation_name
+                self.set_animation('Grabbed')
+                self.is_moving(False)
+            if ishe == False:
+                return
         else:
-            self.set_animation(self.prev_animation)
-        return
+            if ishe == True:
+                if 'Move' not in self.current_animation_name \
+                and 'Grabbed' not in self.current_animation_name:
+                    self.prev_animation = self.current_animation_name
+                self.set_animation('Grabbed')
+            if ishe == False:
+                self.set_animation(self.prev_animation)
 
     def is_moving(self, ishe = None, dir = -1):
         '''
@@ -416,27 +442,26 @@ class TamaWidget():
         '''
         if ishe is None:
             return self.moving
-        if self.is_grabbed():
-            self.direction = None
-            self.moving = False
-            return False
 
-        if dir == 0: direction = 'Move Left'
-        elif dir == 1: direction = 'Move Right'
-        elif dir == 2: direction = 'Falling'
-        else: 
-            self.moving = False
-            return False
-        self.direction = dir
         self.moving = ishe
-        if ishe:
-            self.moving = True
-            self.prev_animation = self.current_animation_name
-            self.set_animation(direction)
+        if dir == 0: 
+            self.direction = 'Move Left'
+        elif dir == 1: 
+            self.direction = 'Move Right'
+        else: 
+            self.direction = "Idle"
+            self.moving = False
+
+        if not self.is_grabbed():
+            if ishe == True:
+                if 'Move' not in self.current_animation_name \
+                and 'Grabbed' not in self.current_animation_name:
+                    self.prev_animation = self.current_animation_name
+                self.set_animation(self.direction)
+            elif ishe == False:
+                self.set_animation(self.prev_animation)
         else:
             self.moving = False
-            self.set_animation(self.prev_animation)
-        return
 
     def pngs_exist(self, gif_idx, anim_name):
         if os.path.exists(os.path.join(os.path.join(self.assets_folder, anim_name), 'Gen')):
@@ -452,10 +477,12 @@ class TamaWidget():
         if self.is_grabbed():
             #in the future, we can set a grabbed + anim_name animation here, and rotate the animation on user drag.
             anim_name = 'Grabbed'
-        if not self.is_moving() and random.randrange(0, 10) == 0:
+        elif not self.is_moving() and random.randrange(0, 2) == 0:
             dir = random.randint(0,1)
             self.is_moving(True, dir)
             return
+        elif self.is_moving() and self.direction is not None:
+            anim_name = self.direction
 
         gifs = [file.path for file in os.scandir(os.path.join(self.assets_folder, anim_name)) if file.is_dir() != True and '.gif' in file.name.lower()]
         if os.path.exists(os.path.join(os.path.join(self.assets_folder, anim_name), 'Gen')):

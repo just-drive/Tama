@@ -42,7 +42,7 @@ class TamaMoodEvent(wx.PyCommandEvent):
         return
 
     def set_current_mood(self, val):
-        self.current_mood = current_mood
+        self.current_mood = val
         return
 
     def get_current_mood(self):
