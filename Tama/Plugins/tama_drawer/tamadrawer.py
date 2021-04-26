@@ -199,7 +199,7 @@ class TamaDrawer(IPlugin, wx.Frame):
             task_pool.insert(idx, self.work_task(item))
 
         task_pool.append(task('Tama Drawer', True, 'Basic Needs', 'calc_mood', []))
-        task_pool.append(task('Tama Drawer', False, 'Basic Needs', 'calc_mood_override', [self.frames[5].is_child_mode()]))
+        task_pool.append(task('Tama Drawer', False, 'Basic Needs', 'calc_mood_override', [self.frames[5].settings()]))
 
         if self.current_mood is None:
             return task_pool
