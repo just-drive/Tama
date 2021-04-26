@@ -221,7 +221,7 @@ class TamaFrame(wx.Frame):
             self.Bind(wx.EVT_MENU, self.show_window_pinning, id=self.itemOneId)
             self.Bind(wx.EVT_MENU, self.show_copyx, id=self.itemTwoId)
             self.Bind(wx.EVT_MENU, self.show_macro_recorder, id=self.itemThreeId)
-            #self.Bind(wx.EVT_MENU, self.show_tama_stats, id=self.itemFourId)
+            self.Bind(wx.EVT_MENU, self.settings, id=self.itemFourId)
             self.Bind(wx.EVT_MENU, self.parent.OnClose, id=self.itemFiveId)
  
         # build the menu
@@ -229,7 +229,7 @@ class TamaFrame(wx.Frame):
         itemOne = menu.Append(self.itemOneId, "Pin a Window...")
         itemTwo = menu.Append(self.itemTwoId, "Copy X...")
         itemThree = menu.Append(self.itemThreeId, "Record Mouse Events...")
-        itemFour = menu.Append(self.itemFourId, "Show Stats... (Not Available)")
+        itemFour = menu.Append(self.itemFourId, "Settings")
         itemFive = menu.Append(self.itemFiveId, "Exit")
  
         # show the popup menu
