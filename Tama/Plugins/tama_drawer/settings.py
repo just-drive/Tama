@@ -41,7 +41,7 @@ class CSMSettings(wx.Dialog):
 
 
 class Settings(wx.Frame):
-    def __init__(self, *args, **kwargs):
+    def __init__(self):
         wx.Frame.__init__(self, None, -1, "Settings",size=(230, 170))
 
         self.panel = wx.Panel(self)
@@ -61,8 +61,12 @@ class Settings(wx.Frame):
         self.panel.SetSizerAndFit(self.sizer)  
         self.Show()
 
-        self.settings = [False]
+        self.settings = [True]
+        self.Bind(wx.EVT_CLOSE, self.OnClose)
 
+    def OnClose(self, event):
+        self.Hide()
+        return
     def onSettings(self, e):
         settings_dialog = CSMSettings(self.settings, self)
         res = settings_dialog.ShowModal()
@@ -90,7 +94,4 @@ class Settings(wx.Frame):
          except:
             pass
 
-
-app = wx.App(False)
-win = Settings(None)
-app.MainLoop()
+    
