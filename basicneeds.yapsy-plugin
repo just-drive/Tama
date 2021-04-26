@@ -1,0 +1,9 @@
+[Core]
+Name = Basic Needs
+Module = basicneeds
+Category = basicneeds
+
+[Documentation]
+Author = Dorsey Roten
+Version = 1.0
+Description = Keeps track of Tama's basic needs system.
