@@ -283,6 +283,35 @@ class BasicNeeds(IPlugin):
             "Modifiers": modifiers
         }
         return self.current_mood
+    
+    def calc_mood_override(self,args=None):
+        if arg[0] == False:
+            return None
+        
+        self.current_mood = {
+            "Conditions": {
+                "Happiness": 'Estatic', 
+                "Satiation": 'Full', 
+                "Energy": 'Excited', 
+                "Health": 'Pristeen'
+            },
+            "Stats": {
+                "Happiness": self.happiness_max, 
+                "Satiation": self.satiation_max,
+                "Energy": self.energy_max, 
+                "Health": self.health_max
+            },
+            "Max": {
+                "Happiness": self.happiness_max, 
+                "Satiation": self.satiation_max,
+                "Energy": self.energy_max, 
+                "Health": self.health_max
+            },
+            "Modifiers": []
+        }
+        return None
+   
+
 
     def add_stat_after_seconds(self, args):
         """

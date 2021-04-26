@@ -1,0 +1,9 @@
+[Core]
+Name = Tama Drawer
+Module = tamadrawer
+Category = user-interface
+
+[Documentation]
+Author = Dorsey Roten
+Version = 1.0
+Description = Draws Tama at any given point in time.

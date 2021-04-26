@@ -138,7 +138,6 @@ dmypy.json
 
 #Tama should ignore this, as every file should be deleted out of it anyways.
 Food Bowl
-/Tama/Assets/Fundamentals-of-Database-Systems-Pearson-2015-Ramez-Elmasri-Shamkant-B.-Navathe - Copy.pdf
 /Tama/Assets
 /Tama/Plugins/tama_drawer/Assets/Grabbed/Gen
 /Tama/Plugins/tama_drawer/Assets/Idle/Gen
