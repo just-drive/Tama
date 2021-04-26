@@ -17,6 +17,7 @@ from Plugins.tama_drawer.window_pinning import WindowPinning
 from Plugins.tama_drawer.copy_x import CopyX
 from Plugins.tama_drawer.macro_recorder import MacroRecorder
 from Plugins.tama_drawer.window_pinning import WindowPinning
+from Plugins.tama_drawer.settings import Settings 
 from Plugins.tama_drawer.tamaframe import TamaFrame
 from Plugins.tama_drawer.tamastatsframe import TamaStatsFrame
 from Plugins.tama_drawer.tama_drawer_events import TamaMoodEvent
