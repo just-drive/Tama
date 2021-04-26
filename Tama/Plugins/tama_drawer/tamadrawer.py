@@ -99,8 +99,9 @@ class TamaDrawer(IPlugin, wx.Frame):
                 TamaStatsFrame(self), 
                 WindowPinning(self),
                 CopyX(),
-                MacroRecorder()
-                #HotkeyChaining()
+                MacroRecorder(),
+                Settings(None)
+                
             ]
         for frame in self.frames:
             frame.Hide()
