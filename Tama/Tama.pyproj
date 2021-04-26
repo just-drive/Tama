@@ -71,7 +71,6 @@
     <Content Include="Assets\booger_boy_slobber.png" />
     <Content Include="Assets\booger_boy_wall_smoosh_left.png" />
     <Content Include="Assets\CSE3311-Inception-Presentation.pptx" />
-    <Content Include="assets\Fundamentals-of-Database-Systems-Pearson-2015-Ramez-Elmasri-Shamkant-B.-Navathe.pdf" />
     <Content Include="assets\helloworld.html" />
     <Content Include="Plugins\basic_needs\basicneeds.yapsy-plugin" />
     <Content Include="Plugins\cli\cli.yapsy-plugin" />
