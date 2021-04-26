@@ -35,6 +35,7 @@ class CSMSettings(wx.Dialog):
         self.EndModal(wx.ID_OK)
 
     def GetSettings(self):
+        print(self.settings)
         return self.settings
 
 
