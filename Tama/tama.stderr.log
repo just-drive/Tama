@@ -1,0 +1,53 @@
+Unable to import plugin: C:\Users\William\Downloads\Tama-main\Tama-main\Tama\Plugins\basic_needs\basicneeds
+Traceback (most recent call last):
+  File "C:\Users\William\AppData\Local\Programs\Python\Python39\lib\site-packages\yapsy\PluginManager.py", line 518, in loadPlugins
+    candidate_module = PluginManager._importModule(plugin_module_name, candidate_filepath)
+  File "C:\Users\William\AppData\Local\Programs\Python\Python39\lib\site-packages\yapsy\PluginManager.py", line 584, in _importModule
+    candidate_module = imp.load_module(plugin_module_name,plugin_file,candidate_filepath+".py",("py","r",imp.PY_SOURCE))
+  File "C:\Users\William\AppData\Local\Programs\Python\Python39\lib\imp.py", line 234, in load_module
+    return load_source(name, filename, file)
+  File "C:\Users\William\AppData\Local\Programs\Python\Python39\lib\imp.py", line 171, in load_source
+    module = _load(spec)
+  File "<frozen importlib._bootstrap>", line 711, in _load
+  File "<frozen importlib._bootstrap>", line 680, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 790, in exec_module
+  File "<frozen importlib._bootstrap>", line 228, in _call_with_frames_removed
+  File "C:\Users\William\Downloads\Tama-main\Tama-main\Tama\Plugins\basic_needs\basicneeds.py", line 6, in <module>
+    from Plugins.basic_needs.eatingsystem import EatingSystem
+  File "C:\Users\William\Downloads\Tama-main\Tama-main\Tama\Plugins\basic_needs\eatingsystem.py", line 3, in <module>
+    from send2trash import send2trash
+ModuleNotFoundError: No module named 'send2trash'
+Unable to import plugin: C:\Users\William\Downloads\Tama-main\Tama-main\Tama\Plugins\tama_drawer\tamadrawer
+Traceback (most recent call last):
+  File "C:\Users\William\AppData\Local\Programs\Python\Python39\lib\site-packages\yapsy\PluginManager.py", line 518, in loadPlugins
+    candidate_module = PluginManager._importModule(plugin_module_name, candidate_filepath)
+  File "C:\Users\William\AppData\Local\Programs\Python\Python39\lib\site-packages\yapsy\PluginManager.py", line 584, in _importModule
+    candidate_module = imp.load_module(plugin_module_name,plugin_file,candidate_filepath+".py",("py","r",imp.PY_SOURCE))
+  File "C:\Users\William\AppData\Local\Programs\Python\Python39\lib\imp.py", line 234, in load_module
+    return load_source(name, filename, file)
+  File "C:\Users\William\AppData\Local\Programs\Python\Python39\lib\imp.py", line 171, in load_source
+    module = _load(spec)
+  File "<frozen importlib._bootstrap>", line 711, in _load
+  File "<frozen importlib._bootstrap>", line 680, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 790, in exec_module
+  File "<frozen importlib._bootstrap>", line 228, in _call_with_frames_removed
+  File "C:\Users\William\Downloads\Tama-main\Tama-main\Tama\Plugins\tama_drawer\tamadrawer.py", line 9, in <module>
+    import webbrowswer
+ModuleNotFoundError: No module named 'webbrowswer'
+Unable to import plugin: C:\Users\William\Downloads\Tama-main\Tama-main\Tama\Plugins\tama_drawer\tamadrawer
+Traceback (most recent call last):
+  File "C:\Users\William\AppData\Local\Programs\Python\Python39\lib\site-packages\yapsy\PluginManager.py", line 518, in loadPlugins
+    candidate_module = PluginManager._importModule(plugin_module_name, candidate_filepath)
+  File "C:\Users\William\AppData\Local\Programs\Python\Python39\lib\site-packages\yapsy\PluginManager.py", line 584, in _importModule
+    candidate_module = imp.load_module(plugin_module_name,plugin_file,candidate_filepath+".py",("py","r",imp.PY_SOURCE))
+  File "C:\Users\William\AppData\Local\Programs\Python\Python39\lib\imp.py", line 234, in load_module
+    return load_source(name, filename, file)
+  File "C:\Users\William\AppData\Local\Programs\Python\Python39\lib\imp.py", line 171, in load_source
+    module = _load(spec)
+  File "<frozen importlib._bootstrap>", line 711, in _load
+  File "<frozen importlib._bootstrap>", line 680, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 790, in exec_module
+  File "<frozen importlib._bootstrap>", line 228, in _call_with_frames_removed
+  File "C:\Users\William\Downloads\Tama-main\Tama-main\Tama\Plugins\tama_drawer\tamadrawer.py", line 9, in <module>
+    import webbrowswer
+ModuleNotFoundError: No module named 'webbrowswer'
