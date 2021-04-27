@@ -3,7 +3,7 @@ import webbrowser
 
 class CSMSettings(wx.Dialog):
     def __init__(self, settings):
-        wx.Dialog.__init__(self, None, -1, "Child Safety Settings",size=(320, 80))
+        wx.Dialog.__init__(self, None, -1, "Child Safety Settings",size=(350, 230))
         self.settings = settings
 
         self.panel = wx.Panel(self)
@@ -18,11 +18,11 @@ class CSMSettings(wx.Dialog):
             checkbox.SetValue(self.settings[i])
             self.checkboxes.append(checkbox)
 
-        self.sizer = wx.BoxSizer()
+        self.sizer = wx.BoxSizer(wx.VERTICAL)
         for checkbox in self.checkboxes:
-            self.sizer.Add(checkbox)
-        self.sizer.Add(self.button_ok)
-        self.sizer.Add(self.button_cancel)
+            self.sizer.Add(checkbox,0, wx.CENTER|wx.ALL, 5)
+        self.sizer.Add(self.button_ok,0, wx.CENTER|wx.ALL, 5)
+        self.sizer.Add(self.button_cancel,0, wx.CENTER|wx.ALL, 5)
 
         self.panel.SetSizerAndFit(self.sizer)
 
@@ -42,7 +42,7 @@ class CSMSettings(wx.Dialog):
 
 class Settings(wx.Frame):
     def __init__(self):
-        wx.Frame.__init__(self, None, -1, "Settings",size=(230, 170))
+        wx.Frame.__init__(self, None, -1, "Settings",size=(230, 230))
 
         self.panel = wx.Panel(self)
         self.button = wx.Button(self.panel, label="Child Safety Mode")
@@ -97,6 +97,7 @@ class Settings(wx.Frame):
                 if (dlg.ShowModal() == wx.ID_OK):
                     path = dlg.GetPath()
                     dlg.Destroy()
+                    aboutBox = wx.MessageDialog(None, "No Updates are Avaliable",'Update', wx.OK)
          except:
             pass
 
