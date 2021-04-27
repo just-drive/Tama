@@ -6,7 +6,7 @@ import wx.adv as adv
 import json
 import threading
 import time
-import webbrowswer
+import webbrowser
 from win32ctypes.pywin32 import win32api
 import win32.lib.win32con as win32con
 import win32.win32gui as win32gui
@@ -101,11 +101,11 @@ class TamaDrawer(IPlugin, wx.Frame):
                 WindowPinning(self),
                 CopyX(),
                 MacroRecorder(),
-                Settings(None)
-                
+                Settings()
             ]
         for frame in self.frames:
             frame.Hide()
+        self.frames[0].Show()
 
         self.current_display = wx.Display().GetFromPoint(self.GetPosition())
         self.Bind(EVT_TAMA_IDLE, self.on_tama_mood)
@@ -199,14 +199,12 @@ class TamaDrawer(IPlugin, wx.Frame):
             task_pool.insert(idx, self.work_task(item))
 
         task_pool.append(task('Tama Drawer', True, 'Basic Needs', 'calc_mood', []))
-        task_pool.append(task('Tama Drawer', False, 'Basic Needs', 'calc_mood_override', [self.frames[5].settings()]))
+        task_pool.append(task('Tama Drawer', False, 'Basic Needs', 'calc_mood_override', [self.frames[5].is_csm_on()]))
 
         if self.current_mood is None:
             return task_pool
         elif self.frames[0] is None:
             return task_pool
-        
-        
 
         self.UpdateMood(self.current_mood)
 

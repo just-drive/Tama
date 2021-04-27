@@ -27,15 +27,16 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Plugins\basic_needs\basicneeds.py" />
     <Compile Include="Plugins\basic_needs\eatingsystem.py" />
     <Compile Include="Plugins\cli\cli.py" />
-    <Compile Include="Plugins\basic_needs\basicneeds.py" />
     <Compile Include="Plugins\basic_needs\__init__.py" />
     <Compile Include="Plugins\cli\__init__.py" />
     <Compile Include="Plugins\tama_drawer\BitmapManip.py" />
     <Compile Include="Plugins\tama_drawer\copy_x.py" />
     <Compile Include="Plugins\tama_drawer\ImgConv.py" />
     <Compile Include="Plugins\tama_drawer\macro_recorder.py" />
+    <Compile Include="Plugins\tama_drawer\settings.py" />
     <Compile Include="Plugins\tama_drawer\tamadrawer.py" />
     <Compile Include="Plugins\tama_drawer\tama_drawer_events.py">
       <SubType>Code</SubType>
@@ -71,7 +72,6 @@
     <Content Include="Assets\booger_boy_slobber.png" />
     <Content Include="Assets\booger_boy_wall_smoosh_left.png" />
     <Content Include="Assets\CSE3311-Inception-Presentation.pptx" />
-    <Content Include="assets\Fundamentals-of-Database-Systems-Pearson-2015-Ramez-Elmasri-Shamkant-B.-Navathe.pdf" />
     <Content Include="assets\helloworld.html" />
     <Content Include="Plugins\basic_needs\basicneeds.yapsy-plugin" />
     <Content Include="Plugins\cli\cli.yapsy-plugin" />
