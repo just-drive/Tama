@@ -76,7 +76,7 @@ class Settings(wx.Frame):
     
     def onAbout(self,e):
          aboutBox = wx.MessageDialog(None, "Tama v1.0" + "\n" + 
-                                     "Uses the BSD-3 License by the Open Source Inititive"+'\n'
+                                     "Uses the BSD-3 License by the Open Source Initiative"+'\n'
                                      +'Developed by William Anderson, Dorsey Roten, and Meron Solomon','About Tama', wx.OK)
          answer=aboutBox.ShowModal()
          aboutBox.Destroy()

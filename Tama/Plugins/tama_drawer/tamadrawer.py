@@ -102,10 +102,10 @@ class TamaDrawer(IPlugin, wx.Frame):
                 CopyX(),
                 MacroRecorder(),
                 Settings()
-                
             ]
         for frame in self.frames:
             frame.Hide()
+        self.frames[0].Show()
 
         self.current_display = wx.Display().GetFromPoint(self.GetPosition())
         self.Bind(EVT_TAMA_IDLE, self.on_tama_mood)
