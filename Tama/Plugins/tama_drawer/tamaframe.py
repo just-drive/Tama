@@ -298,14 +298,14 @@ class TamaFrame(wx.Frame):
             if self.tama_widget.get_movement_direction() == 'Move Left':
                 if self.bounding_boxes[self.current_screen].Contains(
                 wx.Point(window_pos[0]-2, window_pos[1])):
-                    self.SetPosition(wx.Point(window_pos[0]-2, window_pos[1]))
+                    self.Move(window_pos[0]-2, window_pos[1])
                 else:
                     self.tama_widget.is_moving(False)
                     
             elif self.tama_widget.get_movement_direction() == 'Move Right':
                 if self.bounding_boxes[self.current_screen].Contains(
                 wx.Point(window_pos[0] + self.GetSize().GetWidth(), window_pos[1])):
-                    self.SetPosition(wx.Point(window_pos[0]+2, window_pos[1]))
+                    self.Move(window_pos[0]+2, window_pos[1])
                 else:
                     self.tama_widget.is_moving(False)
             else:
@@ -453,6 +453,7 @@ class TamaWidget():
             self.moving = False
 
         if not self.is_grabbed():
+            self.moving = ishe
             if ishe == True:
                 if 'Move' not in self.current_animation_name \
                 and 'Grabbed' not in self.current_animation_name:
@@ -477,12 +478,13 @@ class TamaWidget():
         if self.is_grabbed():
             #in the future, we can set a grabbed + anim_name animation here, and rotate the animation on user drag.
             anim_name = 'Grabbed'
-        elif not self.is_moving() and random.randrange(0, 2) == 0:
-            dir = random.randint(0,1)
-            self.is_moving(True, dir)
+        elif random.randrange(0, 2) == 0:
+            if not self.is_moving():
+                dir = random.randrange(0, 2)
+                self.is_moving(True, dir)
+            else:
+                self.is_moving(False)
             return
-        elif self.is_moving() and self.direction is not None:
-            anim_name = self.direction
 
         gifs = [file.path for file in os.scandir(os.path.join(self.assets_folder, anim_name)) if file.is_dir() != True and '.gif' in file.name.lower()]
         if os.path.exists(os.path.join(os.path.join(self.assets_folder, anim_name), 'Gen')):
