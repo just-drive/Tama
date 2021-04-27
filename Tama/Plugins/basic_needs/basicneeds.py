@@ -37,6 +37,8 @@ class BasicNeeds(IPlugin):
         #Tama path will be read later, as it requires info from Tama to become useful.
         self.tama_path = None
 
+        self.child_override = False
+
         #The thresholds for each of Tama's stats represent the lowest each stat can be before changing to the next level down.
         #These are calculated using a proportion of each stat, in order to allow scaling of Tama's stat maximums.
         self.happiness_thresholds = {
@@ -112,9 +114,10 @@ class BasicNeeds(IPlugin):
 
         #with the time_delta updated, calculate changes in mood, then update the rates and stats. Current mood will be behind current stats
         #by one tick after this function finishes, but this is okay.
-        self.calc_mood()
-        self.calc_rates()
-        self.calc_stats()
+        if not self.child_override:
+            self.calc_mood()
+            self.calc_rates()
+            self.calc_stats()
 
         #if Tama dies, this will return false, and no more calculate_needs tasks will be created in the task pool
         return self.check_if_alive()
@@ -285,9 +288,16 @@ class BasicNeeds(IPlugin):
         return self.current_mood
     
     def calc_mood_override(self,args=None):
-        if arg[0] == False:
+
+        self.child_override = args[0]
+        if args[0] == False:
             return None
-        
+
+        self.happiness = self.happiness_max
+        self.satiation = self.satiation_max
+        self.energy = self.energy_max
+        self.health = self.health_max
+
         self.current_mood = {
             "Conditions": {
                 "Happiness": 'Estatic', 
@@ -311,8 +321,6 @@ class BasicNeeds(IPlugin):
         }
         return None
    
-
-
     def add_stat_after_seconds(self, args):
         """
         This is a task method.

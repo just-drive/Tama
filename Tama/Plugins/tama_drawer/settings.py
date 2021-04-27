@@ -2,7 +2,7 @@ import wx
 import webbrowser
 
 class CSMSettings(wx.Dialog):
-    def __init__(self, settings, *args, **kwargs):
+    def __init__(self, settings):
         wx.Dialog.__init__(self, None, -1, "Child Safety Settings",size=(320, 80))
         self.settings = settings
 
@@ -61,14 +61,20 @@ class Settings(wx.Frame):
         self.panel.SetSizerAndFit(self.sizer)  
         self.Show()
 
-        self.settings = [True]
+        self.settings = [False]
         self.Bind(wx.EVT_CLOSE, self.OnClose)
+
+    def is_csm_on(self):
+        if self.settings[0]:
+            return True
+        return False
 
     def OnClose(self, event):
         self.Hide()
         return
+    
     def onSettings(self, e):
-        settings_dialog = CSMSettings(self.settings, self)
+        settings_dialog = CSMSettings(self.settings)
         res = settings_dialog.ShowModal()
         if res == wx.ID_OK:
             self.settings = settings_dialog.GetSettings()
