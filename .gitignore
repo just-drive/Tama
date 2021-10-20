@@ -136,7 +136,8 @@ dmypy.json
 # VS Project settings
 .vs/
 
-#Tama should ignore this, as every file should be deleted out of it anyways.
+.DS_Store
+/Tama/.vs/
 Food Bowl
 /assets
 /Tama/tama.stderr.log
