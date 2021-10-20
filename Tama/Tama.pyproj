@@ -48,6 +48,7 @@
     <Compile Include="task.py" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Food Bowl\" />
     <Folder Include="Plugins\" />
     <Folder Include="assets\" />
     <Folder Include="Plugins\basic_needs\" />
@@ -65,14 +66,6 @@
     <Folder Include="Plugins\tama_drawer\Assets\Thinking_of_Food\" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="assets\booger_boy_2.png" />
-    <Content Include="Assets\booger_boy_2_wall_smoosh_right.png" />
-    <Content Include="Assets\booger_boy_hungry_tans_code.png" />
-    <Content Include="Assets\booger_boy_sad.png" />
-    <Content Include="Assets\booger_boy_slobber.png" />
-    <Content Include="Assets\booger_boy_wall_smoosh_left.png" />
-    <Content Include="Assets\CSE3311-Inception-Presentation.pptx" />
-    <Content Include="assets\helloworld.html" />
     <Content Include="Plugins\basic_needs\basicneeds.yapsy-plugin" />
     <Content Include="Plugins\cli\cli.yapsy-plugin" />
     <Content Include="Plugins\tama_drawer\Assets\Eating\Tama_Eating_1.gif" />

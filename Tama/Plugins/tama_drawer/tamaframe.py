@@ -291,7 +291,7 @@ class TamaFrame(wx.Frame):
 
     def move_direction(self):
         window_pos = self.GetScreenPosition()
-        if self.tama_widget.is_moving():
+        if self.tama_widget.is_moving() and 'Move' in self.tama_widget.get_anim_name():
             #box represents the client area of the current screen that Tama is located on.
             #and the upper left corner does not have to be 0,0
             box = self.bounding_boxes[self.current_screen]
@@ -393,6 +393,9 @@ class TamaWidget():
         if self.current_animation:
             return self.current_animation[self.frame_idx]
         return None
+
+    def get_anim_name(self):
+        return self.current_animation_name
 
     # Returns the current frame and increments the frame_idx by one.
     def next(self):
