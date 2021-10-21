@@ -148,4 +148,5 @@ Food Bowl
 /Tama/Plugins/tama_drawer/Assets/Move Right/Gen
 /Tama/Plugins/tama_drawer/Assets/Thinking_of_Food/Gen
 /Tama/Plugins/tama_drawer/Assets/Eating/Gen
-/Tama/Plugins/heart/emotion_graph.gml
+/Tama/Plugins/heart/emotion_graph.dot
+/Tama/emotion_graph.jpg

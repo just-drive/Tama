@@ -1,14 +1,17 @@
 from task import task
+import pygraphviz
 import json
 import networkx as nx
 import matplotlib.pyplot as plt
 from yapsy.IPlugin import IPlugin
+import os
 
 class Heart(IPlugin):
     def __init__(self):
         super().__init__()
         self.tama_path = None
         self.emotion_graph = None
+        self.emotion_graph_path = None
         return
 
     def work_task(self, task):
@@ -33,14 +36,17 @@ class Heart(IPlugin):
 
     def get_tama_path(self, path):
         self.tama_path = path
-        emotion_graph_path = path + '/Plugins/Heart/emotion_graph.gml'
+        self.emotion_graph_path = path + '\\Plugins\\Heart\\emotion_graph.dot'
         try:
             #this statement errors if the file doesn't exist yet, so I can create the base graph 
             #in the except clause and save it to file to handle this
-            self.emotion_graph = nx.readwrite.read_gml(emotion_graph_path, 'label')
+            self.emotion_graph = nx.nx_agraph.read_dot(self.emotion_graph_path)
         except:
-            self.emotion_graph = nx.DiGraph()
-            
+            #The emotion graph will change over time as words are added and weights are manipulated
+            #This is the baseline graph that a new Tama instance will create, after creation, Tama will
+            #instead use the graph from file.
+            self.emotion_graph = nx.MultiDiGraph()
+
             #Add surprised emotions
             self.emotion_graph.add_edge('surprised', 'excited')
             self.emotion_graph.add_edge('surprised', 'amazed')
@@ -177,8 +183,14 @@ class Heart(IPlugin):
             self.emotion_graph.add_edge('trusting', 'intimate')
             self.emotion_graph.add_edge('optimistic', 'hopeful')
             self.emotion_graph.add_edge('optimistic', 'inspired')
-            
-            file = nx.readwrite.write_gml(self.emotion_graph, emotion_graph_path)
+            self.save_graph()
+        return
+
+    def save_graph(self):
+        #update the dot file
+        nx.nx_agraph.write_dot(self.emotion_graph, self.emotion_graph_path)
+        #update the associated visualization
+        os.system('dot -Tjpg ' + self.emotion_graph_path + ' -o emotion_graph.jpg')
         return
 
     def tick(self, task_pool):
