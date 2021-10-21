@@ -4,7 +4,7 @@ import json
 import networkx as nx
 import matplotlib.pyplot as plt
 from yapsy.IPlugin import IPlugin
-import os
+import subprocess
 
 class Heart(IPlugin):
     def __init__(self):
@@ -183,6 +183,8 @@ class Heart(IPlugin):
             self.emotion_graph.add_edge('trusting', 'intimate')
             self.emotion_graph.add_edge('optimistic', 'hopeful')
             self.emotion_graph.add_edge('optimistic', 'inspired')
+            
+            nx.set_node_attributes(self.emotion_graph, 100, name="weight")
             self.save_graph()
         return
 
@@ -190,8 +192,22 @@ class Heart(IPlugin):
         #update the dot file
         nx.nx_agraph.write_dot(self.emotion_graph, self.emotion_graph_path)
         #update the associated visualization
-        os.system('dot -Tjpg ' + self.emotion_graph_path + ' -o emotion_graph.jpg')
+        subprocess.call(["dot", "-Tjpg", self.emotion_graph_path, "-o", "emotion_graph.jpg"], force_hide=True)
         return
+
+    #reinforcement of an emotion increases or decreases the weight of the edges connecting to it
+    #isPositive = True means the weight increases
+    def reinforce_emotion(self, emotion, isPositive):
+        if emotion in self.emotion_graph:
+            nb = nx.neighbors(self.emotion_graph, emotion)
+            for n in nb:
+                if isPositive:
+                    n['weight'] = n['weight'] + 1
+                else:
+                    if n['weight'] > 2:
+                        n['weight'] = n['weight'] - 1
+        return
+
 
     def tick(self, task_pool):
         if self.tama_path is None:
@@ -200,4 +216,5 @@ class Heart(IPlugin):
         for idx in idxlist:
             item = task_pool.pop(idx)
             task_pool.insert(idx, self.work_task(item))
+
         return task_pool
