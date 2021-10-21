@@ -9,7 +9,6 @@ The Tama Main module is designed to:
 - Expose a way to safely terminate the program from any plugin
 - Handle outer-level GUI processes.
 '''
-
 import wx
 import wx.aui as aui
 import json

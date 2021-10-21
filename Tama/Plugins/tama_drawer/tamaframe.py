@@ -18,7 +18,7 @@ from Plugins.tama_drawer.tama_drawer_events import TamaMoodEvent
 from Plugins.tama_drawer.tama_drawer_events import EVT_TAMA_MOOD
 #
 # The two tools below were acquired from the below wxPythonWiki tutorial: 
-# -- Insert Here --
+# https://wiki.wxpython.org/WorkingWithImages
 #
 import Plugins.tama_drawer.ImgConv    # wxImage <==> PilImage
 import Plugins.tama_drawer.BitmapManip  # mask wxBmap  <==> PilImage <== file

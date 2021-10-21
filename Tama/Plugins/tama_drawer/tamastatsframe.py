@@ -161,9 +161,9 @@ class TamaStatsWidget(wx.Panel):
 
     def set_gauges(self, gauge_dict):
         self.gauges = gauge_dict
-        for statname, gauge in enumerate(self.gauges):
+        for gauge, statname in enumerate(self.gauges):
             gauge_sizer = wx.BoxSizer(wx.HORIZONTAL)
-            gauge_sizer.Add(gauge, proportion = 1, flag = wx.RIGHT, border = 10)
+            gauge_sizer.Add(self.gauges[statname], proportion = 1, flag = wx.RIGHT, border = 10)
             self.vSizer.Add(gauge_sizer, proportion = 1, flag = wx.ALIGN_TOP)
         self.SetSizer(self.vSizer)
 

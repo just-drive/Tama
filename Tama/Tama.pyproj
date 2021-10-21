@@ -32,6 +32,8 @@
     <Compile Include="Plugins\cli\cli.py" />
     <Compile Include="Plugins\basic_needs\__init__.py" />
     <Compile Include="Plugins\cli\__init__.py" />
+    <Compile Include="Plugins\heart\heart.py" />
+    <Compile Include="Plugins\heart\__init__.py" />
     <Compile Include="Plugins\tama_drawer\BitmapManip.py" />
     <Compile Include="Plugins\tama_drawer\copy_x.py" />
     <Compile Include="Plugins\tama_drawer\ImgConv.py" />
@@ -53,6 +55,7 @@
     <Folder Include="assets\" />
     <Folder Include="Plugins\basic_needs\" />
     <Folder Include="Plugins\cli\" />
+    <Folder Include="Plugins\heart\" />
     <Folder Include="Plugins\tama_drawer\" />
     <Folder Include="Plugins\tama_drawer\Assets\" />
     <Folder Include="Plugins\tama_drawer\Assets\Eating\" />
@@ -68,6 +71,7 @@
   <ItemGroup>
     <Content Include="Plugins\basic_needs\basicneeds.yapsy-plugin" />
     <Content Include="Plugins\cli\cli.yapsy-plugin" />
+    <Content Include="Plugins\heart\heart.yapsy-plugin" />
     <Content Include="Plugins\tama_drawer\Assets\Eating\Tama_Eating_1.gif" />
     <Content Include="Plugins\tama_drawer\Assets\Grabbed\Tama_Grabbed_1.gif" />
     <Content Include="Plugins\tama_drawer\Assets\Idle\Idle_0.gif" />

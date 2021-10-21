@@ -32,6 +32,7 @@ class MainPanel(wx.Panel):
     def __init__(self, parent):
         super().__init__(parent)
         self.cb_value = 'Select App'
+        
         EnumWindows(EnumWindowsProc(foreach_window), 0)
         for title in titles:
             hwnd = win32gui.FindWindow(None,title)
@@ -88,3 +89,6 @@ class WindowPinning(wx.Frame):
     def OnClose(self, event):
         self.Hide()
         return
+
+    def needs_mood(self): return False
+    def needs_update(self): return False
