@@ -1,0 +1,9 @@
+[Core]
+Name = Heart
+Module = heart
+Category = AI
+
+[Documentation]
+Author = Dorsey Roten
+Version = 1.0
+Description = Provides an interface for handling and storing emotion data.
