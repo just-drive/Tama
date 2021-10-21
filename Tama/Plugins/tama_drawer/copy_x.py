@@ -57,3 +57,6 @@ class CopyX(wx.Frame):
     def OnClose(self, event):
         self.Hide()
         return
+
+    def needs_mood(self): return False
+    def needs_update(self): return False

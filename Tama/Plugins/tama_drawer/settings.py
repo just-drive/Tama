@@ -101,4 +101,7 @@ class Settings(wx.Frame):
          except:
             pass
 
+    def needs_mood(self): return False
+    def needs_update(self): return False
+
     
