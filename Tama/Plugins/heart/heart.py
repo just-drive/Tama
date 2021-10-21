@@ -31,7 +31,7 @@ class Heart(IPlugin):
                 task.set_result('REMOVE')
         return task
 
-    def set_tama_path(self, path):
+    def get_tama_path(self, path):
         self.tama_path = path
         emotion_graph_path = path + '/Plugins/Heart/emotion_graph.gml'
         try:
@@ -182,6 +182,8 @@ class Heart(IPlugin):
         return
 
     def tick(self, task_pool):
+        if self.tama_path is None:
+                task_pool.insert(0, task('Heart', True, 'Tama', 'get_tama_path', []))
         idxlist = task.find_tasks('Heart', task_pool)
         for idx in idxlist:
             item = task_pool.pop(idx)
